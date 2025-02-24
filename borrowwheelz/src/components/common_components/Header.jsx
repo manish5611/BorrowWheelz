@@ -18,10 +18,10 @@ const Header = () => {
               <a className="nav-link text-white" href="#">Home</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link text-white" href="#">Features</a>
+              <a className="nav-link text-white" href="#">About Us</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link text-white" href="#">Pricing</a>
+              <a className="nav-link text-white" href="/contact-us">Contact Us</a>
             </li>
             <li className="nav-item dropdown">
               <a className="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
