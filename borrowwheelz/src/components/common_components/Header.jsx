@@ -1,4 +1,6 @@
 import React from 'react';
+import logo from "../../assets/images/logo.jpeg"
+import { MdOutlineTwoWheeler } from "react-icons/md";
 
 const Header = () => {
   return (
@@ -6,6 +8,7 @@ const Header = () => {
       <div className="container-fluid d-flex justify-content-between align-items-center">
         
         {/* Logo and Title */}
+        <MdOutlineTwoWheeler className='w-10 h-10'/> 
         <h1 className="fs-2 fw-bold text-uppercase tracking-wide m-0">
           <span className="text-primary">Borrow </span>
           <span className="text-light">Wheel<span className="text-danger">Z</span></span>
@@ -28,7 +31,7 @@ const Header = () => {
                 Account
               </a>
               <ul className="dropdown-menu">
-                <li><a className="dropdown-item" href="#">Login</a></li>
+                <li><a className="dropdown-item" href="/login">Login</a></li>
                 <li><a className="dropdown-item" href="#">Sign Up</a></li>
               
               </ul>
