@@ -9,6 +9,8 @@ import Header from './components/common_components/Header'
 import Footer from './components/common_components/Footer'
 import ContactPage from './pages/common_pages/contactpage'
 import Login from './pages/user_pages/login_page'
+import About from './pages/common_pages/Aboutuspage'
+import CarRentalPage from './pages/car_rental/CarRentalPage'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -23,6 +25,11 @@ function App() {
         <Route path="/login" element={<Login />}></Route>
 
         <Route path="/contact-us" element={<ContactPage />}></Route>
+        <Route path="/contact" element={<ContactPage />}></Route>
+        <Route path="/about" element={<About />}></Route>
+        <Route path="/about-us" element={<About />}></Route>
+
+        <Route path="/car-rent" element={<CarRentalPage />}></Route>
 
         <Route path="/pagenoutfound" element={<Pagenotfound />}></Route>
         <Route path="/*" element={<Pagenotfound />}></Route>

@@ -1,78 +1,68 @@
-import React from 'react';
+import React from "react";
+import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <footer className="bg-dark text-white py-3 shadow w-100  left-0 px-4">
-      <div className="container d-flex justify-content-evenly text-center flex-wrap">
-        
-        {/* Column 1 */}
-        <ul className="nav flex-column">
-          <li className="nav-item">
-            <a className="nav-link text-white fw-bold" href="#">About Us</a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link text-white" href="#">Our Services</a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link text-white" href="#">Testimonials</a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link text-muted disabled" aria-disabled="true">Careers</a>
-          </li>
-        </ul>
+    <footer className="bg-gray-900 text-white py-8">
+      <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Logo & About */}
+        <div>
+          <h2 className="text-2xl font-bold text-blue-400">BorrowWheelz</h2>
+          <p className="text-gray-400 mt-2">
+            Your trusted platform for renting and selling cars.
+          </p>
+          <div className="flex space-x-4 mt-4">
+            <a href="#" className="text-gray-400 hover:text-blue-400">
+              <FaFacebook size={20} />
+            </a>
+            <a href="#" className="text-gray-400 hover:text-blue-400">
+              <FaTwitter size={20} />
+            </a>
+            <a href="#" className="text-gray-400 hover:text-blue-400">
+              <FaInstagram size={20} />
+            </a>
+          </div>
+        </div>
 
-        {/* Column 2 */}
-        <ul className="nav flex-column">
-          <li className="nav-item">
-            <a className="nav-link text-white fw-bold" href="#">Support</a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link text-white" href="#">FAQs</a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link text-white" href="#">Help Center</a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link text-white" href="#">Contact Us</a>
-          </li>
-        </ul>
+        {/* Navigation */}
+        <div>
+          <h3 className="text-lg font-semibold text-gray-300">Quick Links</h3>
+          <ul className="mt-4 space-y-2">
+            <li>
+              <Link to="/" className="text-gray-400 hover:text-blue-400">
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link to="/cars" className="text-gray-400 hover:text-blue-400">
+                Cars
+              </Link>
+            </li>
+            <li>
+              <Link to="/about" className="text-gray-400 hover:text-blue-400">
+                About
+              </Link>
+            </li>
+            <li>
+              <Link to="/contact" className="text-gray-400 hover:text-blue-400">
+                Contact
+              </Link>
+            </li>
+          </ul>
+        </div>
 
-        {/* Column 3 */}
-        <ul className="nav flex-column">
-          <li className="nav-item">
-            <a className="nav-link text-white fw-bold" href="#">Quick Links</a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link text-white" href="#">Rent a Car</a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link text-white" href="#">Bike Rentals</a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link text-white" href="#">Offers</a>
-          </li>
-        </ul>
-
-        {/* Column 4 */}
-        <ul className="nav flex-column">
-          <li className="nav-item">
-            <a className="nav-link text-white fw-bold" href="#">Follow Us</a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link text-white" href="#">Facebook</a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link text-white" href="#">Instagram</a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link text-white" href="#">Twitter</a>
-          </li>
-        </ul>
+        {/* Contact Info */}
+        <div>
+          <h3 className="text-lg font-semibold text-gray-300">Contact Us</h3>
+          <p className="mt-4 text-gray-400">Email: Borrowwheelz@gmail.com</p>
+          <p className="text-gray-400">Phone: 9611752722</p>
+          <p className="text-gray-400">Location: 1st Main Road, Bagalgunte, Bangalore - 73</p>
+        </div>
       </div>
 
-      {/* Copyright Section */}
-      <div className="text-center mt-3 border-top pt-3 ">
-        <p className="m-0 ">&copy; {new Date().getFullYear()} Borrow Wheelz. All rights reserved.</p>
+      <div className="border-t border-gray-700 mt-8 pt-4 text-center text-gray-500 text-sm">
+        © 2025 CarRent. All rights reserved.
       </div>
     </footer>
   );

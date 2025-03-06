@@ -1,30 +1,48 @@
-import React from 'react';
-import logo from "../../assets/images/logo.jpeg"
-import { MdOutlineTwoWheeler } from "react-icons/md";
+import React from "react";
+import { Link } from "react-router-dom";
+import { FaUserCircle } from "react-icons/fa"; // Import user icon
 
 const Header = () => {
   return (
-    <div className="bg-gray-800 text-white py-3 nav1">
-      <div className="container-fluid d-flex justify-content-between align-items-center ">
-        
-        {/* Logo and Title */}
-        
-        <a href="/" className="fs-2 fw-bold text-uppercase tracking-wide m-0 hover:text-orange-500">
-          BORROW WHEELZ
+    <header className="bg-blue-100 shadow-md py-4">
+      <div className="container mx-auto flex justify-between items-center px-6">
+        {/* Logo */}
+        <a href="/" className="text-2xl font-bold text-blue-800">
+          Borrow<span className="text-black">Wheelz</span>
         </a>
 
-        {/* Navbar */}
-        <nav>
-        <ul className="flex space-x-6 mr-5">
-        <li><a href="/" className="hover:text-orange-500 head">Home</a></li>
-        <li><a href="#" className="hover:text-orange-500 head">Cars</a></li>
-        <li><a href="#" className="hover:text-orange-500 head">Services</a></li>
-        <li><a href="/contact-us" className="hover:text-orange-500 head">Contact</a></li>
-      </ul>
+        {/* Navigation - Centered */}
+        <nav className="mx-auto">
+          <ul className="flex space-x-8 font-bold">
+            <li>
+              <Link to="/" className="text-gray-700 hover:text-blue-500">
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link to="/car-rent" className="text-gray-700 hover:text-blue-500">
+                Cars
+              </Link>
+            </li>
+            <li>
+              <Link to="/about" className="text-gray-700 hover:text-blue-500">
+                About
+              </Link>
+            </li>
+            <li>
+              <Link to="/contact" className="text-gray-700 hover:text-blue-500">
+                Contact
+              </Link>
+            </li>
+          </ul>
         </nav>
 
+        {/* Profile Icon - Right */}
+        <Link to="/account" className="text-gray-700 hover:text-blue-500">
+          <FaUserCircle className="text-2xl" />
+        </Link>
       </div>
-    </div>
+    </header>
   );
 };
 
