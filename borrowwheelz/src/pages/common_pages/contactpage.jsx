@@ -1,16 +1,17 @@
 import React from 'react';
-import car_front from "../../assets/images/car_front.jpg"
+import bmwcontact from "../../assets/images/bmwcontact.png";
 
 const ContactPage = () => {
   return (
     <div className="bg-blue-100 min-h-screen">
-      {/* Hero Section */}
-      <div className="relative h-60 bg-cover bg-center flex items-center justify-center text-white" 
-        style={{ backgroundImage: `url(${car_front})` }}>
+      {/* Hero Section with Background Image */}
+      <div 
+        className="relative h-60 bg-cover bg-center flex items-center justify-center text-white" 
+        style={{ backgroundImage: `url(${bmwcontact})`, backgroundSize: "cover", backgroundPosition: "center" }}
+      >
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
         <h1 className="text-3xl font-bold relative">Contact</h1>
       </div>
-      
 
       {/* Contact Section */}
       <div className="text-center mt-10">
@@ -64,7 +65,7 @@ const ContactPage = () => {
               <input type="text" className="w-full border border-gray-300 p-2 rounded-md" placeholder="Your Phone" />
             </div>
 
-            {/* Subject */}
+            {/* Email */}
             <input type="text" className="w-full border border-gray-300 p-2 rounded-md" placeholder="Your Email" />
 
             {/* Message */}
