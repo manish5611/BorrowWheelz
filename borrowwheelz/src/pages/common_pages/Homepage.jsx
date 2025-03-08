@@ -77,7 +77,7 @@ const Homepage = () => {
       {/* CTA Section */}
       <div className="py-16 grid grid-cols-1 md:grid-cols-2 gap-6 px-6 max-w-5xl mx-auto">
         <div className="bg-blue-100 p-8 rounded-lg shadow">
-          <h3 className="text-xl font-semibold">Are You Looking For a Bike?</h3>
+          <h3 className="text-xl font-semibold">Do You Want to Rent Out Bike?</h3>
           <p className="mt-2 text-gray-600">
             Find the best deals on top-quality vehicles.
           </p>

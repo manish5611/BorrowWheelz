@@ -35,7 +35,7 @@ const AboutUs = () => {
               </ul>
               <div className="mt-4 bg-red-500 text-white px-4 py-2 inline-block rounded-lg">
                 <p>Call Us for Your Next Ride</p>
-                <p className="font-bold">+123-2006-2012</p>
+                <p className="font-bold">+91 8747005611</p>
               </div>
             </div>
             
