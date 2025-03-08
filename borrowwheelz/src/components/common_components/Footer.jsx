@@ -8,7 +8,9 @@ const Footer = () => {
       <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Logo & About */}
         <div>
-          <h2 className="text-2xl font-bold text-blue-400">BorrowWheelz</h2>
+          <Link to="/" onClick={() => window.scrollTo(0, 0)} className="text-2xl font-bold text-blue-400 hover:underline">
+            BorrowWheelz
+          </Link>
           <p className="text-gray-400 mt-2">
             Your trusted platform for renting and selling cars.
           </p>
@@ -30,7 +32,7 @@ const Footer = () => {
           <h3 className="text-lg font-semibold text-gray-300">Quick Links</h3>
           <ul className="mt-4 space-y-2">
             <li>
-              <Link to="/" className="text-gray-400 hover:text-blue-400">
+              <Link to="/" onClick={() => window.scrollTo(0, 0)} className="text-gray-400 hover:text-blue-400">
                 Home
               </Link>
             </li>
