@@ -1,42 +1,36 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Homepage from './pages/common_pages/Homepage'
-import {BrowserRouter as Router,Routes,Route} from 'react-router-dom'
-import Pagenotfound from './pages/common_pages/Pagenotfound'
-import Header from './components/common_components/Header'
-import Footer from './components/common_components/Footer'
-import ContactPage from './pages/common_pages/contactpage'
-import Login from './pages/user_pages/login_page'
-import About from './pages/common_pages/Aboutuspage'
-import CarRentalPage from './pages/car_rental/CarRentalPage'
+import { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Homepage from './pages/common_pages/Homepage';
+import Pagenotfound from './pages/common_pages/Pagenotfound';
+import Header from './components/common_components/Header';
+import Footer from './components/common_components/Footer';
+import ContactPage from './pages/common_pages/contactpage';
+import Login from './pages/user_pages/login_page';
+import About from './pages/common_pages/Aboutuspage';
+import CarRentalPage from './pages/car_rental/CarRentalPage';
+import ThankYouPage from './pages/common_pages/ThankYouPage'; // Import the Thank You page
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <Router>
       <Header />
       <Routes>
-        <Route path="/" element={<Homepage />}></Route>
-        <Route path="/home" element={<Homepage />}></Route>
-        <Route path="/homepage" element={<Homepage />}></Route>
-        <Route path="/login" element={<Login />}></Route>
-
-        <Route path="/contact-us" element={<ContactPage />}></Route>
-        <Route path="/contact" element={<ContactPage />}></Route>
-        <Route path="/about" element={<About />}></Route>
-        <Route path="/about-us" element={<About />}></Route>
-
-        <Route path="/car-rent" element={<CarRentalPage />}></Route>
-
-        <Route path="/pagenoutfound" element={<Pagenotfound />}></Route>
-        <Route path="/*" element={<Pagenotfound />}></Route>
+        <Route path="/" element={<Homepage />} />
+        <Route path="/home" element={<Homepage />} />
+        <Route path="/homepage" element={<Homepage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/contact-us" element={<ContactPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/about-us" element={<About />} />
+        <Route path="/car-rent" element={<CarRentalPage />} />
+        <Route path="/thank-you" element={<ThankYouPage />} /> {/* New Route Added */}
+        <Route path="/pagenotfound" element={<Pagenotfound />} />
+        <Route path="/*" element={<Pagenotfound />} />
       </Routes>
       <Footer />
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
