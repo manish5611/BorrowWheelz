@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import CarRentalCollection from "../../pages/car_pages/CarRentalCollection";
-import CarRentalAdvantages from "../car_pages/CarRentalAdvantages";
-import CarRentalShowcase from "../car_pages/CarRentalShowcase";
-import CarRentalGallery from "../car_pages/CarRentalGallery";
-import CarRentalHero from "../car_pages/CarRentalHero";
-import CarRentalTestimonials from "../car_pages/CarRentalTestimonials";
-import CarRentalFeature from "../car_pages/CarRentalFeature";
+import CarRentalCollection from "../../components/car_components/CarRentalCollection";
+import CarRentalFeature from "../../components/car_components/CarRentalFeature";
+import CarRentalGallery from "../../components/car_components/CarRentalGallery";
+import CarRentalHero from "../../components/car_components/CarRentalHero";
+import CarRentalShowcase from "../../components/car_components/CarRentalShowcase";
+import CarRentalTestimonials from "../../components/car_components/CarRentalTestimonials";
+import CarRentalAdvantages from "../../components/car_components/CarRentalAdvantages"
+
 import carfoot from "../../assets/images/car_foot.jfif"
 
 const images = ["/images/car_front.jpg", "/images/suv_car.jfif", "/images/bmw.jpg", "/images/porsche.jpg"];
