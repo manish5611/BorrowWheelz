@@ -1,5 +1,5 @@
 {
-  "name": "borrowwheelz",
+  "name": "allora",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,13 +10,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "antd": "^5.24.2",
-    "axios": "^1.7.9",
+    "@heroicons/react": "^2.2.0",
+    "axios": "^1.8.1",
+    "bcrypt": "^5.1.1",
+    "framer-motion": "^12.4.10",
+    "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
-    "react-redux": "^9.2.0",
-    "react-router-dom": "^7.2.0"
+    "react-router-dom": "^7.2.0",
+    "react-slick": "^0.30.3",
+    "react-toastify": "^11.0.5",
+    "slick-carousel": "^1.8.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
@@ -31,6 +37,6 @@
     "globals": "^15.14.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
-    "vite": "^6.1.1"
+    "vite": "^6.1.0"
   }
 }
