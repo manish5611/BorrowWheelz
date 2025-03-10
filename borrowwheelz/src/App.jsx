@@ -15,9 +15,9 @@ import Homepage from "./pages/common_pages/Homepage";
 import Header from "./components/header_components/Header";
 import Footer from "./components/footer_components/Footer";
 import PageNotFound from "./pages/common_pages/PageNotFound";
-import ContactUs from "./pages/contact_pages/ContactUs";
-import TopHeader from "./components/header_components/TopHeader";
-import AboutUs from "./pages/common_pages/AboutUs";
+import ContactPage from "./pages/common_pages/contactpage";
+// import TopHeader from "./components/header_components/TopHeader";
+import AboutUs from "../src/pages/common_pages/Aboutuspage"
 
 // user pages.
 import Login from "./pages/user_pages/Login";
@@ -29,11 +29,12 @@ import Profile from "./pages/user_pages/Profile";
 import UpdateProfile from "./pages/user_pages/UpdateProfile";
 
 // blog pages.
-import AllBlogs from "./pages/car_pages/AllBlogs";
+// import AllBlogs from "./pages/car_pages/AllBlogs";
 import SingleBlog from "./pages/car_pages/SingleBlog";
+import AllCars from "./pages/car_pages/AllCars";
 
 // newsletter
-import NewsLetter from "./components/common_components/NewsLetter";
+// import NewsLetter from "./components/common_components/NewsLetter";
 
 // ✅ Function to dynamically update the page title based on the current route
 const TitleUpdater = () => {
@@ -56,7 +57,7 @@ const TitleUpdater = () => {
       return "Page Not Found";
     };
 
-    document.title = `${getPageTitle(location.pathname)} - Allora`;
+    document.title = `${getPageTitle(location.pathname)} - Borrow Wheelz`;
   }, [location.pathname]); // ✅ Runs only when pathname changes
 
   return null;
@@ -76,9 +77,9 @@ function App() {
           <Route path="/homepage" element={<Homepage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/contact-us" element={<ContactUs />} />
+          <Route path="/contact-us" element={<ContactPage />} />
           <Route path="/about-us" element={<AboutUs />} />
-          <Route path="/all-blogs" element={<AllBlogs />} />
+          <Route path="/all-cars" element={<AllCars />} />
           <Route path="/single-blog/:id" element={<SingleBlog />} />
           <Route path="/page-not-found" element={<PageNotFound />} />
           <Route path="/*" element={<PageNotFound />} />
@@ -124,7 +125,7 @@ function App() {
             }
           />
         </Routes>
-        <NewsLetter />
+        {/* <NewsLetter /> */}
         <Footer />
       </Router>
     </AuthProvider>
