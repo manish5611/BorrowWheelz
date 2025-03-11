@@ -8,6 +8,8 @@ const path = require("path");
 const fs = require("fs");
 const blogRoutes = require("./routes/BlogRoutes");
 
+
+
 //import user routes.
 const userRoutes = require("./routes/UserRoutes");
 const contactRoutes = require("./routes/ContactRoutes");
@@ -44,6 +46,7 @@ app.use("/api", categoryRoutes);
 app.use("/api", productRoutes);
 app.use("/api", vendorRoutes);
 app.use("/api", outletRoutes);
+app.use("/api", carRoutes);
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -57,7 +60,7 @@ app.use((req, res, next) => {
 const PORT = process.env.PORT;
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/allora")
+  .connect("mongodb://127.0.0.1:27017/borrowwheelz")
   .then(() => {
     console.log("Connected to mongodb.");
   })

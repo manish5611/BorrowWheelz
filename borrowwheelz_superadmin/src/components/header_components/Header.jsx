@@ -42,8 +42,8 @@ const Header = () => {
               </Link>
             </li>
             <li>
-              <Link className="text-dark font-semibold" to="/add-blog">
-                Add Blog
+              <Link className="text-dark font-semibold" to="/add-car">
+                Add Car
               </Link>
             </li>
           </>

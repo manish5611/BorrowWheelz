@@ -44,6 +44,9 @@ import AllReplies from "./pages/contact_pages/AllReplies";
 // blog pages.
 import AddBlog from "./pages/blog_pages/AddBlog";
 
+// car pages.
+import AddCar from "./pages/car_pages/AddCar"
+
 // subscription page.
 import Subscriptions from "./pages/subscription_pages/Subscriptions";
 
@@ -101,6 +104,7 @@ const TitleUpdater = () => {
       if (pathname.startsWith("/reply-message/")) return "Reply Message";
       if (pathname.startsWith("/all-replies")) return "All Replies";
       if (pathname.startsWith("/add-blog")) return "Add Blog";
+      if (pathname.startsWith("/add-car")) return "Add Car";
       if (pathname.startsWith("/subscriptions")) return "Subscriptions";
       if (pathname.startsWith("/add-category")) return "Add Category";
       if (pathname.startsWith("/all-categories")) return "All Categories";
@@ -293,6 +297,17 @@ function App() {
               </PrivateRoutes>
             }
           />
+
+           {/* car page routes  */}
+           <Route
+            path="/add-car"
+            element={
+              <PrivateRoutes allowedRoles={["superadmin", "admin"]}>
+                <AddCar />
+              </PrivateRoutes>
+            }
+          />
+
           {/* subscription page routes  */}
           <Route
             path="/subscriptions"
