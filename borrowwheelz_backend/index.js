@@ -6,7 +6,12 @@ const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken"); // For token verification
 const path = require("path");
 const fs = require("fs");
+
+
 const blogRoutes = require("./routes/BlogRoutes");
+const carRoutes = require("./routes/CarRoutes");
+const brandRoutes = require("./routes/BrandRoutes");
+
 
 
 
@@ -47,6 +52,8 @@ app.use("/api", productRoutes);
 app.use("/api", vendorRoutes);
 app.use("/api", outletRoutes);
 app.use("/api", carRoutes);
+app.use("/api", brandRoutes);
+
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
