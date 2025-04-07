@@ -42,7 +42,7 @@ import ReplyMessage from "./pages/contact_pages/ReplyMessage";
 import AllReplies from "./pages/contact_pages/AllReplies";
 
 // blog pages.
-import AddBlog from "./pages/blog_pages/AddBlog";
+
 
 // car pages.
 import AddCar from "./pages/car_pages/AddCar"
@@ -73,7 +73,8 @@ import AddVendor from "./pages/vendor_pages/AddVendor";
 import AllVendors from "./pages/vendor_pages/AllVendors";
 import SingleVendor from "./pages/vendor_pages/SingleVendor";
 import AddRawMaterialToVendor from "./pages/vendor_pages/AddRawMaterialToVendor";
-import AllRawMaterials from "./pages/vendor_pages/AllRawMaterials";
+
+import AddBrand from "./pages/blog_pages/AddBrand";
 
 // ✅ Function to dynamically update the page title based on the current route
 const TitleUpdater = () => {
@@ -103,7 +104,7 @@ const TitleUpdater = () => {
       if (pathname.startsWith("/all-messages/")) return "All Messages";
       if (pathname.startsWith("/reply-message/")) return "Reply Message";
       if (pathname.startsWith("/all-replies")) return "All Replies";
-      if (pathname.startsWith("/add-blog")) return "Add Blog";
+      if (pathname.startsWith("/add-brand")) return "Add Brand";
       if (pathname.startsWith("/add-car")) return "Add Car";
       if (pathname.startsWith("/subscriptions")) return "Subscriptions";
       if (pathname.startsWith("/add-category")) return "Add Category";
@@ -289,14 +290,7 @@ function App() {
           />
 
           {/* blog page routes  */}
-          <Route
-            path="/add-blog"
-            element={
-              <PrivateRoutes allowedRoles={["superadmin", "admin"]}>
-                <AddBlog />
-              </PrivateRoutes>
-            }
-          />
+          
 
            {/* car page routes  */}
            <Route
@@ -304,6 +298,14 @@ function App() {
             element={
               <PrivateRoutes allowedRoles={["superadmin", "admin"]}>
                 <AddCar />
+              </PrivateRoutes>
+            }
+          />
+           <Route
+            path="/add-brand"
+            element={
+              <PrivateRoutes allowedRoles={["superadmin", "admin"]}>
+                <AddBrand />
               </PrivateRoutes>
             }
           />

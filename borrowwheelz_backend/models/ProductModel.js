@@ -57,7 +57,7 @@ const productSchema = new mongoose.Schema({
 
 // Middleware to update 'updatedAt' field automatically
 productSchema.pre("save", function (next) {
-  this.updatedAt = Date.now();
+  this.updatedAt = Date.now();a
   next();
 });
 

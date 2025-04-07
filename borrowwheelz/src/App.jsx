@@ -30,8 +30,6 @@ import UpdateProfile from "./pages/user_pages/UpdateProfile";
 
 // blog pages.
 // import AllBlogs from "./pages/car_pages/AllBlogs";
-import SingleBlog from "./pages/car_pages/SingleBlog";
-import AllCars from "./pages/car_pages/AllCars";
 
 // newsletter
 // import NewsLetter from "./components/common_components/NewsLetter";
@@ -52,8 +50,7 @@ const TitleUpdater = () => {
       if (pathname.startsWith("/forgot-password/")) return "Forgot Password";
       if (pathname.startsWith("/reset-password/")) return "Reset Password";
       if (pathname.startsWith("/profile/")) return "Profile";
-      if (pathname.startsWith("/all-blogs")) return "All Blogs";
-      if (pathname.startsWith("/single-blog/")) return "Single Blog";
+      
       return "Page Not Found";
     };
 
@@ -79,8 +76,6 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/contact-us" element={<ContactPage />} />
           <Route path="/about-us" element={<AboutUs />} />
-          <Route path="/all-cars" element={<AllCars />} />
-          <Route path="/single-blog/:id" element={<SingleBlog />} />
           <Route path="/page-not-found" element={<PageNotFound />} />
           <Route path="/*" element={<PageNotFound />} />
 

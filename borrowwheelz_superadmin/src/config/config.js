@@ -1,3 +1,2 @@
-const backendGlobalRoute = "http://localhost:3001"; // Replace with your actual backend URL
-
+const backendGlobalRoute = "http://localhost:3001"; // Make sure this is correct!
 export default backendGlobalRoute;

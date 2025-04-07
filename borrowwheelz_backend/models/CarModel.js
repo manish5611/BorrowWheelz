@@ -1,58 +1,28 @@
 const mongoose = require("mongoose");
-const slugify = require("slugify");
 
-const carSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-    },
-    brand: {
-      type: String,
-      required: true,
-    },
-    modelYear: {
-      type: String,
-      required: true,
-    },
-    location: {
-      type: String,
-      required: true,
-    },
-    rentalPricePerDay: {
-      type: String,
-      required: true,
-    },
-    availability: {
-      type: Boolean,
-      default: true,
-    },
-    carImage: {
-      type: String, // Store image path or URL
-      required: false,
-    },
-    slug: {
-      type: String,
-      unique: true,
-    },
-    viewCount: {
-      type: Number,
-      default: 0,
-    },
-  },
-  {
-    timestamps: true,
-  }
-);
+const carSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  brandId: { type: mongoose.Schema.Types.ObjectId, ref: "Brand", required: true },
 
-// Middleware to generate slug from car name before saving
+  location: { type: String, required: true },
+  pricePerDay: { type: Number, required: true },
+  seats: { type: Number, required: true },
+  fuelType: { type: String, required: true },
+  transmission: { type: String, required: true },
+  availability: { type: String, default: true },
+  features: [{ type: String }],
+  image: { type: String }, // main image
+  allImages: [{ type: String }],
+  slug: { type: String, required: true, unique: true },
+  viewCount: { type: Number, default: 0 },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+});
+
 carSchema.pre("save", function (next) {
-  if (this.isModified("name")) {
-    this.slug = slugify(this.name, { lower: true, strict: true });
-  }
+  this.updatedAt = Date.now();
   next();
 });
 
 const Car = mongoose.model("Car", carSchema);
-
 module.exports = Car;
