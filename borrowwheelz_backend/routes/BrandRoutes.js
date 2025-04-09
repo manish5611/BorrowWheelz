@@ -7,14 +7,14 @@ const {
 
 const router = express.Router();
 
-// Add brand with image
+// Route to add a new brand
 router.post(
   "/add-brand",
   brandUpload.fields([{ name: "image", maxCount: 1 }]),
   addBrand
 );
 
-// Get all brands
+// Route to get all brands
 router.get("/brands", getAllBrands);
 
 module.exports = router;

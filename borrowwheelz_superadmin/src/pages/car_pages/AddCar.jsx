@@ -1,23 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import backendGlobalRoute from "../../config/config";
 
 export default function AddCar() {
   const [name, setName] = useState("");
-  const [brand, setBrand] = useState("");
+  const [brandId, setBrandId] = useState("");
+  const [brands, setBrands] = useState([]);
   const [location, setLocation] = useState("");
   const [pricePerDay, setPricePerDay] = useState("");
   const [seats, setSeats] = useState("");
   const [fuelType, setFuelType] = useState("");
   const [transmission, setTransmission] = useState("");
-  const [availability, setAvailability] = useState("");
+  const [availability, setAvailability] = useState(true); // default to true
   const [features, setFeatures] = useState("");
   const [image, setImage] = useState(null);
   const [allImages, setAllImages] = useState([]);
   const [message, setMessage] = useState("");
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchBrands();
+  }, []);
+
+  const fetchBrands = async () => {
+    try {
+      const response = await axios.get(`${backendGlobalRoute}/api/brands`);
+      setBrands(response.data);
+    } catch (error) {
+      console.error("Error fetching brands", error);
+    }
+  };
 
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
@@ -32,7 +46,7 @@ export default function AddCar() {
 
     const formData = new FormData();
     formData.append("name", name);
-    formData.append("brand", brand);
+    formData.append("brandId", brandId);
     formData.append("location", location);
     formData.append("pricePerDay", pricePerDay);
     formData.append("seats", seats);
@@ -40,9 +54,7 @@ export default function AddCar() {
     formData.append("transmission", transmission);
     formData.append("availability", availability);
     formData.append("features", features);
-    if (image) {
-      formData.append("image", image);
-    }
+    if (image) formData.append("image", image);
     if (allImages && allImages.length > 0) {
       allImages.forEach((file) => formData.append("allImages", file));
     }
@@ -51,27 +63,13 @@ export default function AddCar() {
       const response = await axios.post(
         `${backendGlobalRoute}/api/add-car`,
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
       setMessage("Car added successfully!");
-      setName("");
-      setBrand("");
-      setLocation("");
-      setPricePerDay("");
-      setSeats("");
-      setFuelType("");
-      setTransmission("");
-      setAvailability("");
-      setFeatures("");
-      setImage(null);
-      setAllImages([]);
       alert("New Car added successfully.");
+      navigate("/admin/allcars"); // optional redirection
     } catch (error) {
-      console.error("There was an error adding the Car!", error);
+      console.error("Error adding the Car!", error);
       setMessage("Error adding Car. Please try again.");
     }
   };
@@ -81,44 +79,127 @@ export default function AddCar() {
       <h2 className="text-2xl font-bold text-gray-900 mb-4">Add New Car</h2>
       {message && <p className="text-green-500">{message}</p>}
       <form onSubmit={handleSubmit} encType="multipart/form-data">
-        {[
-          { label: "Name", value: name, setter: setName, type: "text" },
-          { label: "Brand", value: brand, setter: setBrand, type: "text" },
-          { label: "Location", value: location, setter: setLocation, type: "text" },
-          { label: "Price Per Day", value: pricePerDay, setter: setPricePerDay, type: "number" },
-          { label: "Seats", value: seats, setter: setSeats, type: "number" },
-          { label: "Fuel Type", value: fuelType, setter: setFuelType, type: "text" },
-          { label: "Transmission", value: transmission, setter: setTransmission, type: "text" },
-          { label: "Availability", value: availability, setter: setAvailability, type: "text" },
-          { label: "Features (comma-separated)", value: features, setter: setFeatures, type: "text" },
-        ].map((field, idx) => (
-          <div className="mb-4" key={idx}>
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor={field.label}
-            >
-              {field.label}
-            </label>
-            <input
-              id={field.label}
-              type={field.type}
-              value={field.value}
-              onChange={(e) => field.setter(e.target.value)}
-              required={field.label !== "Features (comma-separated)"}
-              className="w-full px-3 py-2 border rounded"
-            />
-          </div>
-        ))}
-
+        {/* Car Name */}
         <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="image"
+          <label className="block text-sm font-bold mb-2">Car Name</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="w-full px-3 py-2 border rounded"
+          />
+        </div>
+
+        {/* Brand Dropdown */}
+        <div className="mb-4">
+          <label className="block text-sm font-bold mb-2">Brand</label>
+          <select
+            value={brandId}
+            onChange={(e) => setBrandId(e.target.value)}
+            required
+            className="w-full px-3 py-2 border rounded"
           >
-            Featured Image
+            <option value="">Select Brand</option>
+            {brands.map((brand) => (
+              <option key={brand._id} value={brand._id}>
+                {brand.brand_name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Location */}
+        <div className="mb-4">
+          <label className="block text-sm font-bold mb-2">Location</label>
+          <input
+            type="text"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            required
+            className="w-full px-3 py-2 border rounded"
+          />
+        </div>
+
+        {/* Price Per Day */}
+        <div className="mb-4">
+          <label className="block text-sm font-bold mb-2">Price Per Day</label>
+          <input
+            type="number"
+            value={pricePerDay}
+            onChange={(e) => setPricePerDay(e.target.value)}
+            required
+            className="w-full px-3 py-2 border rounded"
+          />
+        </div>
+
+        {/* Seats */}
+        <div className="mb-4">
+          <label className="block text-sm font-bold mb-2">Seats</label>
+          <input
+            type="number"
+            value={seats}
+            onChange={(e) => setSeats(e.target.value)}
+            required
+            className="w-full px-3 py-2 border rounded"
+          />
+        </div>
+
+        {/* Fuel Type */}
+        <div className="mb-4">
+          <label className="block text-sm font-bold mb-2">Fuel Type</label>
+          <input
+            type="text"
+            value={fuelType}
+            onChange={(e) => setFuelType(e.target.value)}
+            required
+            className="w-full px-3 py-2 border rounded"
+          />
+        </div>
+
+        {/* Transmission */}
+        <div className="mb-4">
+          <label className="block text-sm font-bold mb-2">Transmission</label>
+          <input
+            type="text"
+            value={transmission}
+            onChange={(e) => setTransmission(e.target.value)}
+            required
+            className="w-full px-3 py-2 border rounded"
+          />
+        </div>
+
+        {/* Availability Dropdown */}
+        <div className="mb-4">
+          <label className="block text-sm font-bold mb-2">Availability</label>
+          <select
+            value={availability}
+            onChange={(e) => setAvailability(e.target.value === "true")}
+            className="w-full px-3 py-2 border rounded"
+          >
+            <option value="">Select Availability</option>
+            <option value="true">Available</option>
+            <option value="false">Not Available</option>
+          </select>
+        </div>
+
+        {/* Features */}
+        <div className="mb-4">
+          <label className="block text-sm font-bold mb-2">
+            Features (comma-separated)
           </label>
           <input
-            id="image"
+            type="text"
+            value={features}
+            onChange={(e) => setFeatures(e.target.value)}
+            className="w-full px-3 py-2 border rounded"
+          />
+        </div>
+
+        {/* Featured Image */}
+        <div className="mb-4">
+          <label className="block text-sm font-bold mb-2">Featured Image</label>
+          <input
             type="file"
             accept="image/*"
             onChange={handleImageChange}
@@ -126,15 +207,12 @@ export default function AddCar() {
           />
         </div>
 
+        {/* Additional Images */}
         <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="allImages"
-          >
+          <label className="block text-sm font-bold mb-2">
             Additional Images
           </label>
           <input
-            id="allImages"
             type="file"
             multiple
             accept="image/*"
@@ -143,6 +221,7 @@ export default function AddCar() {
           />
         </div>
 
+        {/* Submit Button */}
         <div className="mb-4">
           <button
             type="submit"
