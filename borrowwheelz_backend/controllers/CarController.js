@@ -2,8 +2,9 @@ const Car = require("../models/CarModel");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const slugify = require("slugify"); // for manual slug generation if needed
 
-// Multer storage config for car images
+// Multer config
 const carStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     const uploadDir = "uploads/cars";
@@ -13,21 +14,18 @@ const carStorage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    cb(
-      null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-    );
+    cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname));
   },
 });
 
 const carUpload = multer({ storage: carStorage });
 
-// Controller to add a new car
+// Add Car Controller
 const addCar = async (req, res) => {
   try {
     const {
       name,
-      brand,
+      brandId, // correct key name
       location,
       pricePerDay,
       seats,
@@ -37,23 +35,31 @@ const addCar = async (req, res) => {
       features,
     } = req.body;
 
+    // Required fields validation
+    if (!name || !brandId || !location || !pricePerDay || !seats || !fuelType || !transmission) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // Handle image uploads
     const image = req.files?.["image"]?.[0]?.path.replace(/\\/g, "/") || "";
-    const allImages =
-      req.files?.["allImages"]?.map((file) => file.path.replace(/\\/g, "/")) ||
-      [];
+    const allImages = req.files?.["allImages"]?.map((file) =>
+      file.path.replace(/\\/g, "/")
+    ) || [];
 
     const newCar = new Car({
       name,
-      brand,
+      brandId,
       location,
       pricePerDay,
       seats,
       fuelType,
       transmission,
-      availability,
+      availability: availability === "true" || availability === true, // ensures boolean
       features: features ? features.split(",") : [],
       image,
       allImages,
+      // manually generating slug (model will auto-generate if this is missing)
+      slug: slugify(name, { lower: true }),
     });
 
     await newCar.save();
@@ -65,10 +71,10 @@ const addCar = async (req, res) => {
   }
 };
 
-// Controller to fetch all cars
+// Get all cars
 const getAllCars = async (req, res) => {
   try {
-    const cars = await Car.find().lean();
+    const cars = await Car.find().populate("brandId").lean();
 
     const modifiedCars = cars.map((car) => {
       if (car.image) {

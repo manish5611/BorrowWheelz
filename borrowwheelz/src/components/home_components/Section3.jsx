@@ -12,7 +12,7 @@ const CarFleet = () => {
       try {
         const response = await axios.get("http://localhost:3001/api/cars");
         setCars(response.data);
-        setFilteredCars(response.data.slice(0, 10)); // Default: show all
+        setFilteredCars(response.data.slice(0, 10)); // Default: show first 10
       } catch (error) {
         console.error("Error fetching cars:", error);
       }
@@ -37,7 +37,9 @@ const CarFleet = () => {
     if (brandName === "All") {
       setFilteredCars(cars.slice(0, 10));
     } else {
-      const filtered = cars.filter((car) => car.brand === brandName);
+      const filtered = cars.filter(
+        (car) => car.brandId?.brand_name === brandName
+      );
       setFilteredCars(filtered);
     }
   };
@@ -67,7 +69,6 @@ const CarFleet = () => {
               {brand.brand_name}
             </button>
 
-            {/* Divider line (skip after last item) */}
             {index < arr.length - 1 && (
               <span className="text-gray-300 text-xl select-none">|</span>
             )}
@@ -92,7 +93,9 @@ const CarFleet = () => {
                 <h3 className="text-xl font-semibold text-gray-800">
                   {car.name}
                 </h3>
-                <p className="text-sm text-gray-500 mb-2">{car.brand}</p>
+                <p className="text-sm text-gray-500 mb-2">
+                  {car.brandId?.brand_name || "Unknown Brand"}
+                </p>
                 <div className="flex flex-wrap gap-3 text-sm text-gray-600">
                   <span>🚗 {car.seats} Seats</span>
                   <span>⛽ {car.fuelType}</span>

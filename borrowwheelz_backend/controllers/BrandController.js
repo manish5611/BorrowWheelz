@@ -13,21 +13,28 @@ const brandStorage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    cb(
-      null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-    );
+    cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
   },
 });
 
 const brandUpload = multer({ storage: brandStorage });
 
-// Add new brand
+// ✅ Add new brand
 const addBrand = async (req, res) => {
   try {
     const { brand_name } = req.body;
 
     const image = req.files?.["image"]?.[0]?.path.replace(/\\/g, "/") || "";
+
+    if (!brand_name || !image) {
+      return res.status(400).json({ error: "Brand name and image are required" });
+    }
+
+    // ✅ Moved this inside the async function
+    const existingBrand = await Brand.findOne({ brand_name });
+    if (existingBrand) {
+      return res.status(409).json({ error: "Brand already exists" });
+    }
 
     const newBrand = new Brand({
       brand_name,
