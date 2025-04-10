@@ -27,6 +27,7 @@ import ForgotPassword from "./pages/user_pages/ForgotPassword";
 import ResetPassword from "./pages/user_pages/ResetPassword";
 import Profile from "./pages/user_pages/Profile";
 import UpdateProfile from "./pages/user_pages/UpdateProfile";
+import AllCars from "./pages/car_pages/AllCars";
 
 // blog pages.
 // import AllBlogs from "./pages/car_pages/AllBlogs";
@@ -73,6 +74,10 @@ function App() {
           <Route path="/home" element={<Homepage />} />
           <Route path="/homepage" element={<Homepage />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/vehicles" element={<AllCars />} />
+          <Route path="/vehicle" element={<AllCars />} />
+          <Route path="/all-cars" element={<AllCars />} />
+          <Route path="/allcars" element={<AllCars />} />
           <Route path="/register" element={<Register />} />
           <Route path="/contact-us" element={<ContactPage />} />
           <Route path="/about-us" element={<AboutUs />} />
