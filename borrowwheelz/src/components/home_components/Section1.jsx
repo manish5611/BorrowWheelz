@@ -79,16 +79,6 @@ const Section1 = () => {
           </button>
         </div>
       </div>
-      <div className="flex justify-evenly space-x-6 px-10 py-6 container my-6 ">
-        {/* Title */}
-        <h2 className="text-6xl font-bold">Services</h2>
-
-        {/* Description */}
-        <p className="text-gray-600 max-w-lg pt-3 w-96">
-          We invite you to try our services, and we personally guarantee that
-          you will be completely satisfied.
-        </p>
-      </div>
     </div>
   );
 };
