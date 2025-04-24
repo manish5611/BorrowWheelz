@@ -1,41 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const priceTabs = [
-  "1 - 5 Lakh",
-  "5 - 10 Lakh",
-  "10 - 15 Lakh",
-  "15 - 20 Lakh",
-  "20 - 35 Lakh",
-  "35 - 50 Lakh",
-  "50 Lakh - 1 Crore",
-  "Above 1 Crore",
-];
-
-const carData = [
-  {
-    name: "Tata Tiago",
-    price: "₹ 5 - 8.45 Lakh*",
-    image: "https://imgd.aeplcdn.com/664x374/n/cw/ec/41103/tata-tiago-exterior-right-front-three-quarter-3.jpeg",
-  },
-  {
-    name: "Maruti Alto K10",
-    price: "₹ 4.23 - 6.21 Lakh*",
-    image: "https://imgd.aeplcdn.com/664x374/n/cw/ec/127281/maruti-suzuki-alto-k10-right-front-three-quarter0.jpeg",
-  },
-  {
-    name: "Renault KWID",
-    price: "₹ 4.70 - 6.45 Lakh*",
-    image: "https://imgd.aeplcdn.com/664x374/n/cw/ec/108237/kwid-exterior-right-front-three-quarter-3.jpeg",
-  },
-  {
-    name: "Maruti S-Presso",
-    price: "₹ 4.26 - 6.12 Lakh*",
-    image: "https://imgd.aeplcdn.com/664x374/n/cw/ec/143211/s-presso-exterior-right-front-three-quarter-2.jpeg",
-  },
+  "500 - 3,000",
+  "3,000 - 7,000",
+  "7,000 - 12,000",
+  "12,000 - 20,000",
 ];
 
 const Vehicles = () => {
-  const [activeTab, setActiveTab] = useState("1 - 5 Lakh");
+  const [activeTab, setActiveTab] = useState("500 - 3,000");
+  const [cars, setCars] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCars = async () => {
+      try {
+        const response = await axios.get("http://localhost:3001/api/cars");
+        setCars(response.data);
+      } catch (error) {
+        console.error("Error fetching cars:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCars();
+  }, []);
+
+  const filterCarsByPrice = (range) => {
+    const priceRanges = {
+      "500 - 3,000": [500, 3000],
+      "3,000 - 7,000": [3000, 7000],
+      "7,000 - 12,000": [7000, 12000],
+      "12,000 - 20,000": [12000, 20000],
+    };
+
+    const [minPrice, maxPrice] = priceRanges[range] || [0, 20000];
+
+    return cars.filter((car) => {
+      const carPrice = parseInt(car.pricePerDay); // use pricePerDay instead of price
+      return !isNaN(carPrice) && carPrice >= minPrice && carPrice <= maxPrice;
+    });
+  };
+
+  const filteredCars = filterCarsByPrice(activeTab);
 
   return (
     <div className="w-full bg-white py-10 px-4">
@@ -44,7 +53,6 @@ const Vehicles = () => {
           Explore Rentals by Price Range
         </h2>
 
-        {/* Price Tabs */}
         <div className="flex flex-wrap items-center gap-4 border-b mb-6 overflow-x-auto">
           {priceTabs.map((tab) => (
             <button
@@ -61,28 +69,42 @@ const Vehicles = () => {
           ))}
         </div>
 
-        {/* Car Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {carData.map((car, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-xl border shadow-sm hover:shadow-md transition-all"
-            >
-              <img
-                src={car.image}
-                alt={car.name}
-                className="w-full h-36 sm:h-40 object-cover rounded-t-xl"
-              />
-              <div className="p-3">
-                <h3 className="text-sm font-medium text-gray-900">{car.name}</h3>
-                <p className="text-xs text-gray-600 mt-1">{car.price}</p>
-                <button className="mt-3 w-full border border-orange-500 text-orange-500 py-1.5 text-sm rounded hover:bg-orange-50 transition-all">
-                  Get On-Road Price
-                </button>
+        {loading ? (
+          <div className="text-center text-gray-500">Loading cars...</div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {filteredCars.length === 0 ? (
+              <div className="col-span-full text-center text-gray-500">
+                No cars found in this price range.
               </div>
-            </div>
-          ))}
-        </div>
+            ) : (
+              filteredCars.map((car, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-xl border shadow-sm hover:shadow-md transition-all"
+                >
+                  <img
+                    src={car.image}
+                    alt={car.name}
+                    className="w-full h-36 sm:h-40 object-cover rounded-t-xl"
+                    onError={(e) =>
+                      (e.target.src = 'https://via.placeholder.com/150?text=No+Image')
+                    }
+                  />
+                  <div className="p-3">
+                    <h3 className="text-sm font-medium text-gray-900">{car.name}</h3>
+                    <p className="text-xs text-gray-600 mt-1">
+                      ₹{car.pricePerDay ?? 'N/A'} / day
+                    </p>
+                    <button className="mt-3 w-full border border-orange-500 text-orange-500 py-1.5 text-sm rounded hover:bg-orange-50 transition-all">
+                      CheckOut
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

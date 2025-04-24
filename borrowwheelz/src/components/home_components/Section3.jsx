@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
+import { FaCar } from "react-icons/fa";
 
 const CarFleet = () => {
   const [cars, setCars] = useState([]);
-  const [brands, setBrands] = useState([]);
-  const [filteredCars, setFilteredCars] = useState([]);
-  const [selectedBrand, setSelectedBrand] = useState("All");
+  const scrollRef = useRef(null);
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     const fetchCars = async () => {
       try {
         const response = await axios.get("http://localhost:3001/api/cars");
         setCars(response.data);
-        setFilteredCars(response.data.slice(0, 10)); // Default: show first 10
       } catch (error) {
         console.error("Error fetching cars:", error);
       }
@@ -20,100 +19,123 @@ const CarFleet = () => {
     fetchCars();
   }, []);
 
+  // Auto-scroll logic
   useEffect(() => {
-    const fetchBrands = async () => {
-      try {
-        const response = await axios.get("http://localhost:3001/api/brands");
-        setBrands(response.data.slice(0, 10));
-      } catch (error) {
-        console.error("Error fetching Brands:", error);
-      }
-    };
-    fetchBrands();
-  }, []);
+    if (cars.length <= 6) return;
 
-  const handleBrandClick = (brandName) => {
-    setSelectedBrand(brandName);
-    if (brandName === "All") {
-      setFilteredCars(cars.slice(0, 10));
-    } else {
-      const filtered = cars.filter(
-        (car) => car.brandId?.brand_name === brandName
-      );
-      setFilteredCars(filtered);
-    }
+    const scrollContainer = scrollRef.current;
+    let scrollAmount = 0;
+
+    intervalRef.current = setInterval(() => {
+      if (scrollContainer) {
+        scrollContainer.scrollBy({ left: 1, behavior: "smooth" });
+        scrollAmount += 1;
+
+        // Reset scroll to start when reaching end
+        if (
+          scrollContainer.scrollLeft + scrollContainer.clientWidth >=
+          scrollContainer.scrollWidth
+        ) {
+          scrollContainer.scrollTo({ left: 0, behavior: "smooth" });
+          scrollAmount = 0;
+        }
+      }
+    }, 30); // adjust speed by tweaking interval or scroll amount
+
+    return () => clearInterval(intervalRef.current);
+  }, [cars]);
+
+  // Pause scrolling on hover
+  const handleMouseEnter = () => clearInterval(intervalRef.current);
+  const handleMouseLeave = () => {
+    if (cars.length <= 6) return;
+
+    const scrollContainer = scrollRef.current;
+    intervalRef.current = setInterval(() => {
+      if (scrollContainer) {
+        scrollContainer.scrollBy({ left: 1, behavior: "smooth" });
+        if (
+          scrollContainer.scrollLeft + scrollContainer.clientWidth >=
+          scrollContainer.scrollWidth
+        ) {
+          scrollContainer.scrollTo({ left: 0, behavior: "smooth" });
+        }
+      }
+    }, 30);
   };
 
   return (
-    <div className="container mx-auto my-24 px-4">
-      <div className="flex justify-center mb-12">
-        <h2 className="text-6xl font-bold font-serif mr-20">Our Fleet</h2>
-        <p className="p-2 w-96 font-semibold">
-          We offer an extensive fleet of vehicles including Hyundai, Mahindra,
-          Kia and Tata
+    <div className="container mx-auto my-10 px-4">
+      {/* Heading */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6">
+        <h2 className="text-4xl lg:text-5xl font-bold font-serif mb-4 lg:mb-0 flex gap-3 items-center">
+          <FaCar className="text-blue-600" /> Our Fleet
+        </h2>
+        <p className="text-gray-600 max-w-xl text-sm lg:text-base">
+          Browse through our premium fleet of rental cars.
         </p>
       </div>
 
-      {/* Brand filter buttons with "All" option */}
-      <div className="flex flex-wrap justify-center mb-10 space-x-4">
-        {[{ brand_name: "All" }, ...brands].map((brand, index, arr) => (
-          <div key={brand.brand_name} className="flex items-center space-x-4">
-            <button
-              onClick={() => handleBrandClick(brand.brand_name)}
-              className={`cursor-pointer text-sm font-medium hover:text-blue-700 transition ${
-                selectedBrand === brand.brand_name
-                  ? "text-blue-600 font-bold"
-                  : "text-gray-700"
-              }`}
-            >
-              {brand.brand_name}
-            </button>
-
-            {index < arr.length - 1 && (
-              <span className="text-gray-300 text-xl select-none">|</span>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Car display */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {filteredCars.length > 0 ? (
-          filteredCars.map((car) => (
+      {/* Horizontal Scrollable Car Cards */}
+      <div
+        ref={scrollRef}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className="flex overflow-x-auto space-x-6 pb-2 scrollbar-hide"
+        style={{ scrollBehavior: "smooth" }}
+      >
+        {cars.length > 0 ? (
+          cars.map((car) => (
             <div
               key={car._id}
-              className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+              className="min-w-[270px] bg-white rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition duration-300"
             >
-              <img
-                src={car.image}
-                alt={car.name}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-xl font-semibold text-gray-800">
-                  {car.name}
-                </h3>
-                <p className="text-sm text-gray-500 mb-2">
+              <div className="relative">
+                <img
+                  src={car.image}
+                  alt={car.name}
+                  className="w-full h-44 object-cover rounded-t-xl transition-transform duration-300"
+                />
+                {car.availability ? (
+                  <span className="absolute top-3 right-3 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                    Available
+                  </span>
+                ) : (
+                  <span className="absolute top-3 right-3 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                    Unavailable
+                  </span>
+                )}
+              </div>
+              <div className="p-4 space-y-2">
+                <h3 className="text-lg font-bold text-gray-800">{car.name}</h3>
+                <p className="text-sm text-gray-500">
                   {car.brandId?.brand_name || "Unknown Brand"}
                 </p>
-                <div className="flex flex-wrap gap-3 text-sm text-gray-600">
-                  <span>🚗 {car.seats} Seats</span>
-                  <span>⛽ {car.fuelType}</span>
-                  <span>⚙️ {car.transmission}</span>
+                <div className="flex flex-wrap gap-2 text-xs font-medium text-gray-600">
+                  <span className="bg-gray-100 px-2 py-1 rounded-full">
+                    🚗 {car.seats} Seats
+                  </span>
+                  <span className="bg-gray-100 px-2 py-1 rounded-full">
+                    ⛽ {car.fuelType}
+                  </span>
+                  <span className="bg-gray-100 px-2 py-1 rounded-full">
+                    ⚙️ {car.transmission}
+                  </span>
                 </div>
-                <div className="mt-4 font-semibold text-blue-600">
-                  ₹{car.pricePerDay} / day
-                </div>
-                <div className="mt-2 text-sm text-gray-500">
-                  {car.availability ? "Available" : "Not Available"}
+                <div className="flex justify-between items-center mt-4">
+                  <span className="text-blue-600 font-semibold text-lg">
+                    ₹{car.pricePerDay}{" "}
+                    <span className="text-sm text-gray-500">/ day</span>
+                  </span>
+                  <button className="text-sm bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition">
+                    Rent Now
+                  </button>
                 </div>
               </div>
             </div>
           ))
         ) : (
-          <p className="text-center text-gray-600 col-span-full">
-            No cars available for this brand.
-          </p>
+          <p className="text-center text-gray-600">No cars available.</p>
         )}
       </div>
     </div>
