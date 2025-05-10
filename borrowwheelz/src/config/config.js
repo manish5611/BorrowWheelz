@@ -1,2 +1,3 @@
-const backendGlobalRoute = "http://localhost:3001"; // Make sure this is correct!
-export default backendGlobalRoute;
+const globalBackendRoute = "http://localhost:3010";
+
+export default globalBackendRoute;

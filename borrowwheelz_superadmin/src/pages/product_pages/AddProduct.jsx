@@ -1,208 +1,332 @@
-import React, { useState, useEffect } from "react";
+import globalBackendRoute from "../../config/Config";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import ModernTextInput from "../../components/common_components/MordernTextInput";
 
-const AddProduct = () => {
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [SKU, setSKU] = useState("");
-  const [sectionToAppear, setSectionToAppear] = useState("");
-  const [image, setImage] = useState(null);
-  const [allImages, setAllImages] = useState([]);
+export default function AddProduct() {
+  const navigate = useNavigate();
+  const [productData, setProductData] = useState({
+    product_name: "",
+    slug: "",
+    description: "",
+    sku: "",
+    selling_price: "",
+    display_price: "",
+    brand: "",
+    barcode: "",
+    stock: 0,
+    color: "",
+    material: "",
+    tags: "",
+    category: "",
+    subcategory: "",
+    outlet: "",
+  });
+  const [productImage, setProductImage] = useState(null);
+  const [galleryImages, setGalleryImages] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [subcategoriesAll, setSubcategoriesAll] = useState([]);
+  const [filteredSubcategories, setFilteredSubcategories] = useState([]);
+  const [outlets, setOutlets] = useState([]);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/api/all-categories");
-        setCategories(response.data);
+        const [catRes, subRes, outRes] = await Promise.all([
+          axios.get(`${globalBackendRoute}/api/all-categories`),
+          axios.get(`${globalBackendRoute}/api/all-subcategories`),
+          axios.get(`${globalBackendRoute}/api/all-outlets`),
+        ]);
+        setCategories(catRes.data);
+        setSubcategoriesAll(subRes.data);
+        setOutlets(outRes.data);
       } catch (error) {
-        console.error("Error fetching categories:", error);
+        console.error("Failed to fetch dropdown data:", error);
       }
     };
-    fetchCategories();
+    fetchData();
   }, []);
 
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+  useEffect(() => {
+    if (productData.category) {
+      const filtered = subcategoriesAll.filter(
+        (sub) =>
+          String(sub.category?._id || sub.category) ===
+          String(productData.category)
+      );
+      setFilteredSubcategories(filtered);
+    } else {
+      setFilteredSubcategories([]);
+    }
+  }, [productData.category, subcategoriesAll]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "product_name") {
+      const trimmed = value.trimStart();
+      setProductData({ ...productData, [name]: trimmed });
+    } else {
+      setProductData({ ...productData, [name]: value });
+    }
   };
 
-  const handleAllImagesChange = (e) => {
-    setAllImages(Array.from(e.target.files));
+  const validateProductName = (name) => {
+    const trimmed = name.trim();
+    if (!trimmed) return false;
+    if (/^[^a-zA-Z0-9]+$/.test(trimmed)) return false;
+    return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
 
-    formData.append("name", name);
-    formData.append("category", category);
-    formData.append("description", description);
-    formData.append("SKU", SKU);
-    formData.append("price", price);
-    formData.append("quantity", quantity);
-    formData.append("section_to_appear", sectionToAppear);
-
-    if (image) {
-      formData.append("image", image);
+    const nameValid = validateProductName(productData.product_name);
+    if (!nameValid) {
+      setMessage("Invalid product name.");
+      return;
     }
 
-    allImages.forEach((file) => {
-      formData.append("allImages", file);
-    });
+    if (!productData.sku?.trim()) {
+      setMessage("SKU is required and must be unique.");
+      return;
+    }
+
+    if (!productData.selling_price || isNaN(productData.selling_price)) {
+      setMessage("Selling price is required and must be a valid number.");
+      return;
+    }
+
+    if (!productData.outlet) {
+      setMessage("Outlet is required.");
+      return;
+    }
 
     try {
-      const res = await axios.post("http://localhost:3001/api/add-product", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      const formData = new FormData();
+      Object.entries(productData).forEach(([key, val]) => {
+        // Don't send empty subcategory or category
+        if ((key === "subcategory" || key === "category") && !val) return;
+        formData.append(key, val);
       });
 
-      setMessage("✅ Product added successfully!");
-      // Reset form
-      setName("");
-      setCategory("");
-      setDescription("");
-      setSKU("");
-      setPrice("");
-      setQuantity("");
-      setSectionToAppear("");
-      setImage(null);
-      setAllImages([]);
+      if (productImage) formData.append("product_image", productImage);
+      galleryImages.forEach((file) =>
+        formData.append("all_product_images", file)
+      );
+
+      const res = await axios.post(
+        `${globalBackendRoute}/api/add-product`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      if (res.status === 201) {
+        alert("Product added successfully!");
+        navigate("/all-added-products");
+      } else {
+        throw new Error("Product not created");
+      }
     } catch (error) {
       console.error("Error adding product:", error);
-      setMessage("❌ Error adding product. Please check the inputs and try again.");
+      const errorMsg =
+        error.response?.data?.message || "Failed to add product. Try again.";
+      setMessage(errorMsg);
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-6 border rounded shadow">
-      <h2 className="text-2xl font-bold mb-6">Add Product</h2>
-      {message && <p className="mb-4 font-medium text-center text-blue-600">{message}</p>}
+    <div className="max-w-5xl mx-auto py-10 px-4">
+      <h2 className="text-3xl font-bold mb-6">Add New Product</h2>
+      {message && <p className="text-red-500 text-center">{message}</p>}
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6"
+        encType="multipart/form-data"
+      >
+        <ModernTextInput
+          label="Product Name *"
+          name="product_name"
+          placeholder="Enter product name"
+          value={productData.product_name}
+          onChange={handleChange}
+        />
 
-      <form onSubmit={handleSubmit} encType="multipart/form-data">
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Name</label>
+        <ModernTextInput
+          label="Description *"
+          name="description"
+          placeholder="Enter full description of the product"
+          value={productData.description}
+          onChange={handleChange}
+        />
+        <ModernTextInput
+          label="SKU *"
+          name="sku"
+          placeholder="Enter SKU (must be unique)"
+          value={productData.sku}
+          onChange={handleChange}
+        />
+        <ModernTextInput
+          label="Slug (URL-friendly) *"
+          name="slug"
+          placeholder="example-product-slug"
+          value={productData.slug}
+          onChange={handleChange}
+        />
+
+        <ModernTextInput
+          label="Selling Price *"
+          name="selling_price"
+          type="number"
+          placeholder="Enter selling price"
+          value={productData.selling_price}
+          onChange={handleChange}
+        />
+
+        <ModernTextInput
+          label="Display Price (Optional)"
+          name="display_price"
+          type="number"
+          placeholder="Enter original display price (optional)"
+          value={productData.display_price}
+          onChange={handleChange}
+        />
+        <ModernTextInput
+          label="Brand *"
+          name="brand"
+          placeholder="e.g., Apple, Samsung"
+          value={productData.brand}
+          onChange={handleChange}
+        />
+        <ModernTextInput
+          label="Barcode"
+          name="barcode"
+          placeholder="Enter barcode if available"
+          value={productData.barcode}
+          onChange={handleChange}
+        />
+        <ModernTextInput
+          label="Stock *"
+          name="stock"
+          type="number"
+          placeholder="Enter available stock quantity"
+          value={productData.stock}
+          onChange={handleChange}
+        />
+        <ModernTextInput
+          label="Color"
+          name="color"
+          placeholder="e.g., Black, Red, Silver"
+          value={productData.color}
+          onChange={handleChange}
+        />
+        <ModernTextInput
+          label="Material"
+          name="material"
+          placeholder="e.g., Plastic, Metal"
+          value={productData.material}
+          onChange={handleChange}
+        />
+        <ModernTextInput
+          label="Tags (comma separated)"
+          name="tags"
+          placeholder="e.g., phone, electronics, gadgets"
+          value={productData.tags}
+          onChange={handleChange}
+        />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Select Category *
+            </label>
+            <select
+              name="category"
+              value={productData.category}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+            >
+              <option value="">-- Select Category --</option>
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat._id}>
+                  {cat.category_name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Select Subcategory
+            </label>
+            <select
+              name="subcategory"
+              value={productData.subcategory}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+            >
+              <option value="">-- Select Subcategory --</option>
+              {filteredSubcategories.map((sub) => (
+                <option key={sub._id} value={sub._id}>
+                  {sub.subcategory_name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Select Outlet
+            </label>
+            <select
+              name="outlet"
+              value={productData.outlet}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+            >
+              <option value="">-- Select Outlet --</option>
+              {outlets.map((out) => (
+                <option key={out._id} value={out._id}>
+                  {out.outlet_name || out.name || `Outlet ${out._id}`}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Main Product Image *
+          </label>
           <input
-            className="w-full px-3 py-2 border rounded"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Category</label>
-          <select
-            className="w-full px-3 py-2 border rounded"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            required
-          >
-            <option value="">Select a category</option>
-            {categories.map((cat) => (
-              <option key={cat._id} value={cat._id}>
-                {cat.category_name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Section To Appear</label>
-          <select
-            className="w-full px-3 py-2 border rounded"
-            value={sectionToAppear}
-            onChange={(e) => setSectionToAppear(e.target.value)}
-            required
-          >
-            <option value="">Select section</option>
-            <option value="hero_section">Hero Section</option>
-            <option value="top_sellers">Top Sellers</option>
-            <option value="recent_purchase">Recent Purchase</option>
-            <option value="frequently_bought">Frequently Bought</option>
-            <option value="recommended">Recommended</option>
-            <option value="product_section">Product Section</option>
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Description</label>
-          <textarea
-            className="w-full px-3 py-2 border rounded"
-            rows="3"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          ></textarea>
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">SKU</label>
-          <input
-            className="w-full px-3 py-2 border rounded"
-            type="text"
-            value={SKU}
-            onChange={(e) => setSKU(e.target.value)}
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Price</label>
-          <input
-            className="w-full px-3 py-2 border rounded"
-            type="number"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Quantity</label>
-          <input
-            className="w-full px-3 py-2 border rounded"
-            type="number"
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Cover Image</label>
-          <input
-            className="w-full px-3 py-2 border rounded"
             type="file"
             accept="image/*"
-            onChange={handleImageChange}
-            required
+            onChange={(e) => setProductImage(e.target.files[0])}
+            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-gray-300"
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Gallery Images (optional)</label>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Gallery Images
+          </label>
           <input
-            className="w-full px-3 py-2 border rounded"
             type="file"
             accept="image/*"
             multiple
-            onChange={handleAllImagesChange}
+            onChange={(e) => setGalleryImages([...e.target.files])}
+            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-gray-300"
           />
         </div>
 
         <button
           type="submit"
-          className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
+          className="w-full bg-gradient-to-r from-cyan-500 via-teal-500 to-indigo-500 text-white font-semibold py-2 px-4 rounded-lg shadow hover:opacity-90"
         >
           Add Product
         </button>
       </form>
     </div>
   );
-};
-
-export default AddProduct;
+}
