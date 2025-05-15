@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import globalBackendRoute from "../../config/Config";
 
 const TopCarsIndia = () => {
   const [topCars, setTopCars] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTopCars = async () => {
@@ -28,6 +30,10 @@ const TopCarsIndia = () => {
     return "https://via.placeholder.com/150";
   };
 
+  const handleCarClick = (slug) => {
+    navigate(`/singlerent/${slug}`);
+  };
+
   return (
     <div className="w-full max-w-6xl mx-auto mt-10 px-4">
       <h2 className="text-lg font-semibold mb-4">Top Cars In India</h2>
@@ -38,7 +44,8 @@ const TopCarsIndia = () => {
           topCars.map((car, index) => (
             <div
               key={index}
-              className="min-w-[208px] bg-white rounded-2xl border p-4 hover:shadow transition-all duration-200"
+              className="min-w-[208px] bg-white rounded-2xl border p-4 hover:shadow transition-all duration-200 cursor-pointer"
+              onClick={() => handleCarClick(car.slug)}
             >
               <img
                 src={getImageUrl(car.car_image)}
@@ -52,9 +59,6 @@ const TopCarsIndia = () => {
               <div className="text-base text-green-600 mt-1 font-medium">
                 ₹{car.rental_price_per_day} / day
               </div>
-              <button className="text-xs text-blue-600 mt-2 font-semibold hover:underline">
-                View Price Breakup
-              </button>
             </div>
           ))
         )}

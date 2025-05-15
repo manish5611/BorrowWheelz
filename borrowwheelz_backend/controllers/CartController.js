@@ -3,25 +3,29 @@ const Cart = require("../models/CartModel");
 // Get Cart
 exports.getCart = async (req, res) => {
   try {
-    const cart = await Cart.findOne({ user: req.user.id }).populate(
-      "items.product"
-    );
-    if (!cart) return res.status(200).json({ items: [] });
+    const userId = req.user._id;
+    // Try to populate both Product and Car
+    const cart = await Cart.findOne({ user: userId })
+      .populate({ path: "products.product", model: "Product", strictPopulate: false })
+      .populate({ path: "products.car", model: "Car", strictPopulate: false });
 
-    const formattedItems = cart.items.map((item) => ({
-      _id: item.product._id,
-      product_name: item.product.product_name,
-      selling_price: item.product.selling_price,
-      display_price: item.product.display_price,
-      product_image: item.product.product_image,
-      availability_status: item.product.availability_status,
-      quantity: item.quantity,
-    }));
+    if (!cart || !cart.products) {
+      return res.status(200).json({ products: [] });
+    }
 
-    res.json({ items: formattedItems });
+    // Map products array to include either product or car
+    const products = cart.products
+      .filter((item) => (item.product && item.product._id) || (item.car && item.car._id))
+      .map((item) => ({
+        ...item.toObject(),
+        product: item.product || null,
+        car: item.car || null,
+      }));
+
+    res.status(200).json({ ...cart.toObject(), products });
   } catch (error) {
     console.error("Error fetching cart:", error);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: "Failed to fetch cart", error: error.message });
   }
 };
 

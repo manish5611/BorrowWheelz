@@ -41,15 +41,17 @@ import ThankYou from "../../pages/orders_page/ThankYou";
 
 // wishlist page..
 import Wishlist from "../../pages/wishlist_pages/Wishlist";
+import Book from "../../pages/rent_pages/Book"
 
 // rent page.
 import RentPage from "../../pages/rent_pages/RentPage";
+import SingleRentPage from "../../pages/rent_pages/SingleRentPage";
 
 const MainLayout = () => {
   return (
     <div className="min-h-screen text-gray-900">
       <Header />
-      <main className="flex-grow w-full h-full m-0 p-0">
+      <main className="flex-grow w-full h-full m-0 p-0 ">
         <Routes>
           <Route
             path="/"
@@ -201,6 +203,15 @@ const MainLayout = () => {
           />
 
           <Route
+            path="/book"
+            element={
+              <PageTitle title="Booking">
+                <Book />
+              </PageTitle>
+            }
+          />
+
+          <Route
             path="/my-orders"
             element={
               <PageTitle title="Myorders">
@@ -232,6 +243,15 @@ const MainLayout = () => {
             element={
               <PageTitle title="Rent a Car">
                 <RentPage />
+              </PageTitle>
+            }
+          />
+
+          <Route
+            path="/singlerent/:slug"
+            element={
+              <PageTitle title="Car Details">
+                <SingleRentPage />
               </PageTitle>
             }
           />

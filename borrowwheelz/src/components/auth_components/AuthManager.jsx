@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { Navigate } from "react-router-dom";
+import globalBackendRoute from "../../config/Config"; // <-- make sure this import exists
 
 // 🔐 Create Context
 export const AuthContext = createContext();
@@ -21,32 +22,61 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Fetch full user profile by ID
+  const fetchUserProfile = async (id) => {
+    try {
+      const res = await fetch(`${globalBackendRoute}/api/getUserById/${id}`);
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data;
+    } catch {
+      return null;
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       const decoded = decodeToken(token);
-      if (decoded) {
-        setUser(decoded);
-        setIsLoggedIn(true);
+      if (decoded && decoded.id) {
+        fetchUserProfile(decoded.id).then((profile) => {
+          if (profile && profile._id) {
+            setUser(profile);
+            setIsLoggedIn(true);
+          } else {
+            setUser(null);
+            setIsLoggedIn(false);
+          }
+          setLoading(false);
+        });
+      } else {
+        setUser(null);
+        setIsLoggedIn(false);
+        setLoading(false);
       }
     } else {
       setUser(null);
       setIsLoggedIn(false);
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   const login = async (token) => {
     localStorage.setItem("token", token);
     const decoded = decodeToken(token);
 
-    if (decoded) {
-      setUser(decoded);
-      setIsLoggedIn(true);
+    if (decoded && decoded.id) {
+      const profile = await fetchUserProfile(decoded.id);
+      if (profile && profile._id) {
+        setUser(profile);
+        setIsLoggedIn(true);
+      } else {
+        setUser(null);
+        setIsLoggedIn(false);
+      }
 
       try {
         const localCart = JSON.parse(localStorage.getItem("cart")) || [];
-
         if (localCart.length > 0) {
           await fetch(`${globalBackendRoute}/api/cart/sync`, {
             method: "POST",
@@ -56,9 +86,7 @@ export const AuthProvider = ({ children }) => {
             },
             body: JSON.stringify({ items: localCart }),
           });
-
-          // 🧹 After successful sync, REMOVE guest cart
-          localStorage.removeItem("cart"); // ✅ THIS LINE WAS MISSING!
+          localStorage.removeItem("cart");
         }
       } catch (error) {
         console.error("Cart sync failed:", error);

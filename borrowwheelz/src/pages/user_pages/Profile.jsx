@@ -1,160 +1,121 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import {
-  FaUser,
-  FaEnvelope,
-  FaPhone,
-  FaMapMarkerAlt,
-  FaUserShield,
-} from "react-icons/fa";
-import { MdEdit } from "react-icons/md";
-import { motion } from "framer-motion";
-import { useNavigate, useParams } from "react-router-dom";
-import globalBackendRoute from "../../config/Config";
+import React from 'react';
 
-export default function Profile() {
-  const [userData, setUserData] = useState(null);
-  const navigate = useNavigate();
-  const { id } = useParams();
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(
-          `${globalBackendRoute}/api/getUserById/${id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setUserData(response.data);
-      } catch (error) {
-        console.error("Error fetching user data:", error.message);
-      }
-    };
-    fetchUserData();
-  }, [id]);
-
-  const handleUpdateProfile = () => {
-    navigate(`/update-profile/${userData._id}`);
-  };
-
-  const getImageUrl = (avatar) => {
-    if (!avatar) return "https://placehold.co/150x150?text=No+Image";
-    return `${globalBackendRoute}/${avatar.replace(/\\/g, "/")}`;
-  };
-
-  if (!userData) return <div className="text-center py-8">Loading...</div>;
-
+const Dashboard = () => {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="containerWidth my-6"
-    >
-      <div className="flex flex-col sm:flex-row sm:items-start items-center gap-6">
-        {/* Avatar */}
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="w-auto h-full sm:w-48 sm:h-48"
-        >
-          <img
-            src={getImageUrl(userData.avatar)}
-            alt={userData.name}
-            className="w-full h-full object-cover rounded-xl border bg-gray-100"
-            onError={(e) => {
-              e.currentTarget.onerror = null;
-              e.currentTarget.src =
-                "https://placehold.co/150x150?text=No+Image";
-            }}
-          />
-        </motion.div>
+    <div className="min-h-screen bg-[#f9fafe] px-8 py-6 font-sans text-[#1e1e1e]">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6 mt-16">
+        <h1 className="text-2xl font-semibold ">
+          Good morning, <span className="font-normal text-gray-600">Filip</span>
+        </h1>
+        <input
+          type="text"
+          placeholder="Search for projects"
+          className="rounded-lg px-4 py-2 border border-gray-300 w-64"
+        />
+      </div>
 
-        {/* User Info */}
-        <div className="w-full">
-          <motion.h3
-            className="text-2xl mb-4 font-extrabold"
-            initial={{ x: -30, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-          >
-            Profile
-          </motion.h3>
-
-          <div className="border-t border-gray-200 divide-y divide-gray-100">
-            <ProfileField
-              icon={<FaUser className="text-blue-600" />}
-              label="Full Name"
-              value={userData.name}
-            />
-            <ProfileField
-              icon={<FaEnvelope className="text-green-600" />}
-              label="Email"
-              value={userData.email}
-            />
-            <ProfileField
-              icon={<FaPhone className="text-yellow-600" />}
-              label="Phone"
-              value={userData.phone || "N/A"}
-            />
-            <ProfileField
-              icon={<FaUserShield className="text-red-500" />}
-              label="Role"
-              value={userData.role}
-            />
-            <ProfileField
-              icon={<FaMapMarkerAlt className="text-purple-600" />}
-              label="Street"
-              value={userData.address?.street || "N/A"}
-            />
-            <ProfileField
-              icon={<FaMapMarkerAlt className="text-indigo-600" />}
-              label="City"
-              value={userData.address?.city || "N/A"}
-            />
-            <ProfileField
-              icon={<FaMapMarkerAlt className="text-pink-500" />}
-              label="State"
-              value={userData.address?.state || "N/A"}
-            />
-            <ProfileField
-              icon={<FaMapMarkerAlt className="text-cyan-600" />}
-              label="Postal Code"
-              value={userData.address?.postalCode || "N/A"}
-            />
-            <ProfileField
-              icon={<FaMapMarkerAlt className="text-teal-600" />}
-              label="Country"
-              value={userData.address?.country || "N/A"}
-            />
+      {/* Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Earnings Card */}
+        <div className="bg-[#4f46e5] text-white rounded-xl p-6 col-span-1 flex flex-col justify-between">
+          <div>
+            <p className="text-sm mb-2">Earnings</p>
+            <h2 className="text-3xl font-bold">€8,350</h2>
           </div>
+          <p className="text-sm mt-6 opacity-80">+10% since last month</p>
+        </div>
 
-          {/* Update Button */}
-          <div className="mt-6 text-center">
-            <button
-              onClick={handleUpdateProfile}
-              className=" w-fit px-4 py-2 flex items-center gap-2  bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold rounded-full shadow hover:from-red-700 hover:to-orange-600 transition"
-              // className="w-fit py-2 px-4 bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold rounded-full shadow hover:from-red-700 hover:to-orange-600 transition"
-            >
-              <MdEdit /> Update
-            </button>
+        {/* Rank & Projects */}
+        <div className="col-span-2 grid grid-cols-2 gap-4">
+          {/* Rank */}
+          <div className="bg-white p-4 rounded-xl shadow">
+            <p className="text-sm text-gray-600 mb-1">Rank</p>
+            <h3 className="text-xl font-bold">98</h3>
+            <p className="text-xs text-gray-400">In top 30%</p>
+          </div>
+          {/* Projects */}
+          <div className="bg-white p-4 rounded-xl shadow">
+            <p className="text-sm text-gray-600 mb-1">Projects</p>
+            <h3 className="text-xl font-bold">32</h3>
+            <div className="mt-2 flex gap-2">
+              <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-md">mobile app</span>
+              <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-md">branding</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Your Projects */}
+        <div className="bg-white p-6 rounded-xl shadow col-span-1">
+          <h4 className="text-md font-semibold mb-4">Your Projects</h4>
+          <div className="mb-4 flex items-center gap-3">
+            <img className="w-10 h-10 rounded-full" src="https://i.pravatar.cc/40?img=1" alt="" />
+            <div>
+              <p className="text-sm font-medium">Logo design for Bakery</p>
+              <p className="text-xs text-gray-400">1 day remaining</p>
+            </div>
+          </div>
+          <div className="mb-4 flex items-center gap-3">
+            <img className="w-10 h-10 rounded-full" src="https://i.pravatar.cc/40?img=2" alt="" />
+            <div>
+              <p className="text-sm font-medium">Personal branding project</p>
+              <p className="text-xs text-gray-400">5 days remaining</p>
+            </div>
+          </div>
+          <a href="#" className="text-sm text-indigo-600 font-medium">
+            See all projects
+          </a>
+        </div>
+      </div>
+
+      {/* Bottom Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        {/* Recent Invoices */}
+        <div className="bg-white p-6 rounded-xl shadow col-span-1 md:col-span-1">
+          <h4 className="text-md font-semibold mb-6">Recent Invoices</h4>
+          <div className="mb-4">
+            <p className="text-sm font-medium">Alexander Williams</p>
+            <p className="text-xs text-gray-400">JQ Holdings</p>
+            <div className="flex justify-between mt-2">
+              <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full">Paid</span>
+              <span className="font-semibold">€1,200.87</span>
+            </div>
+          </div>
+          <div>
+            <p className="text-sm font-medium">John Philips</p>
+            <p className="text-xs text-gray-400">Inchar Techs</p>
+            <div className="flex justify-between mt-2">
+              <span className="text-xs bg-red-100 text-red-700 px-3 py-1 rounded-full">Late</span>
+              <span className="font-semibold">€12,989.88</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Recommended Project */}
+        <div className="bg-white p-6 rounded-xl shadow col-span-2">
+          <h4 className="text-md font-semibold mb-4">Recommended Project</h4>
+          <div className="flex items-center gap-3 mb-2">
+            <img className="w-10 h-10 rounded-full" src="https://i.pravatar.cc/40?img=3" alt="" />
+            <div>
+              <p className="font-semibold">Thomas Martin</p>
+              <p className="text-xs text-gray-400">Updated 10m ago</p>
+            </div>
+            <span className="ml-auto bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-full">Design</span>
+          </div>
+          <p className="text-sm font-medium mb-2">
+            Need a designer to form branding essentials for my business.
+          </p>
+          <p className="text-sm text-gray-500 mb-4">
+            Looking for a talented brand designer to create all the branding materials for my new startup.
+          </p>
+          <div className="flex justify-between items-center">
+            <p className="text-lg font-semibold">€8,700 <span className="text-sm font-normal">/ month</span></p>
+            <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">Full time</span>
           </div>
         </div>
       </div>
-    </motion.div>
-  );
-}
-
-function ProfileField({ icon, label, value }) {
-  return (
-    <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 px-2 sm:px-4">
-      <dt className="flex items-center text-sm font-medium text-gray-700 gap-2">
-        {icon} {label}
-      </dt>
-      <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-        {value}
-      </dd>
     </div>
   );
-}
+};
+
+export default Dashboard;

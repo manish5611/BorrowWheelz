@@ -112,6 +112,21 @@ exports.getCarById = async (req, res) => {
   }
 };
 
+exports.getCarBySlug = async (req, res) => {
+  try {
+    const car = await Car.findOne({ slug: req.params.slug, isDeleted: false });
+
+    if (!car) {
+      return res.status(404).json({ message: "Car not found." });
+    }
+
+    res.status(200).json(car);
+  } catch (error) {
+    console.error("Get Car By Slug Error:", error);
+    res.status(500).json({ message: "Failed to fetch car." });
+  }
+};
+
 exports.updateCarById = async (req, res) => {
   try {
     const {

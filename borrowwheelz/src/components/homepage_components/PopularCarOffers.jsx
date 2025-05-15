@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import globalBackendRoute from "../../config/Config";
@@ -8,6 +9,7 @@ const PopularCarOffers = () => {
   const scrollContainerRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPopularCars = async () => {
@@ -45,6 +47,10 @@ const PopularCarOffers = () => {
 
   const scrollRight = () => {
     scrollContainerRef.current.scrollBy({ left: 300, behavior: "smooth" });
+  };
+
+  const handleCarClick = (slug) => {
+    navigate(`/singlerent/${slug}`);
   };
 
   useEffect(() => {
@@ -86,7 +92,8 @@ const PopularCarOffers = () => {
             popularCars.map((car, idx) => (
               <div
                 key={idx}
-                className="min-w-[208px] bg-white rounded-2xl border p-4 hover:shadow transition-all duration-200"
+                className="min-w-[208px] bg-white rounded-2xl border p-4 hover:shadow transition-all duration-200 cursor-pointer"
+                onClick={() => handleCarClick(car.slug)}
               >
                 <img
                   src={getImageUrl(car.car_image)}

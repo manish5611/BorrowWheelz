@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import globalBackendRoute from "../../config/Config";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -8,6 +9,7 @@ const CarsByFuelType = () => {
   const [cars, setCars] = useState([]);
   const [filteredCars, setFilteredCars] = useState([]);
   const scrollRef = useRef(null);
+  const navigate = useNavigate();
 
   const tabs = ["Petrol Cars", "Diesel Cars", "Electric Cars", "Hybrid Cars", "CNG Cars"];
 
@@ -51,6 +53,10 @@ const CarsByFuelType = () => {
     scrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
   };
 
+  const handleCarClick = (slug) => {
+    navigate(`/singlerent/${slug}`);
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <h2 className="text-xl font-semibold mb-4">Cars by Fuel Type</h2>
@@ -91,7 +97,8 @@ const CarsByFuelType = () => {
             filteredCars.slice(0, 4).map((car, index) => (
               <div
                 key={index}
-                className="min-w-[208px] bg-white border rounded-lg p-4 text-center shadow-sm hover:shadow transition duration-200"
+                className="min-w-[208px] bg-white border rounded-lg p-4 text-center shadow-sm hover:shadow transition duration-200 cursor-pointer"
+                onClick={() => handleCarClick(car.slug)}
               >
                 <img
                   src={getImageUrl(car.car_image)}

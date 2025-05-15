@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import globalBackendRoute from "../../config/Config";
 
 const tabs = ["Budget", "By Brand", "Fuel Type", "Transmission", "Seating Capacity"];
@@ -21,6 +22,7 @@ const CarFilterTabs = () => {
   const [filteredCars, setFilteredCars] = useState([]);
   const [selectedOption, setSelectedOption] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCars = async () => {
@@ -73,6 +75,10 @@ const CarFilterTabs = () => {
       setFilteredCars(filtered);
       setLoading(false);
     }, 300);
+  };
+
+  const handleCarClick = (slug) => {
+    navigate(`/singlerent/${slug}`);
   };
 
   return (
@@ -128,7 +134,8 @@ const CarFilterTabs = () => {
             {filteredCars.map((car) => (
               <div
                 key={car._id}
-                className="bg-white rounded-xl border shadow hover:shadow-lg p-6 transition duration-200 ease-in-out"
+                className="bg-white rounded-xl border shadow hover:shadow-lg p-6 transition duration-200 ease-in-out cursor-pointer"
+                onClick={() => handleCarClick(car.slug)}
               >
                 <img
                   src={getImageUrl(car.car_image)}
@@ -140,9 +147,6 @@ const CarFilterTabs = () => {
                 <p className="text-sm text-gray-500 mt-1">Fuel Type: {car.fuel_type}</p>
                 <p className="text-sm text-gray-500">Transmission: {car.transmission}</p>
                 <p className="text-sm text-gray-500">Seating Capacity: {car.seating_capacity}</p>
-                <button className="mt-4 w-full bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-700 transition">
-                  View Details
-                </button>
               </div>
             ))}
           </div>

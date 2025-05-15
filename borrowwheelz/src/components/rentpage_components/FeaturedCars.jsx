@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import globalBackendRoute from "../../config/Config";
 
@@ -11,6 +12,7 @@ const FeaturedCars = () => {
   const scrollContainerRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCars = async () => {
@@ -56,6 +58,10 @@ const FeaturedCars = () => {
 
   const scrollRight = () => {
     scrollContainerRef.current.scrollBy({ left: 300, behavior: "smooth" });
+  };
+
+  const handleCarClick = (slug) => {
+    navigate(`/singlerent/${slug}`);
   };
 
   useEffect(() => {
@@ -115,7 +121,8 @@ const FeaturedCars = () => {
             filteredCars.map((car, idx) => (
               <div
                 key={idx}
-                className="min-w-[260px] bg-white rounded-xl border p-4 hover:shadow transition-all duration-200"
+                className="min-w-[260px] bg-white rounded-xl border p-4 hover:shadow transition-all duration-200 cursor-pointer"
+                onClick={() => handleCarClick(car.slug)}
               >
                 <img
                   src={getImageUrl(car.car_image)}
@@ -129,9 +136,6 @@ const FeaturedCars = () => {
                 <div className="text-base text-green-600 mt-1 font-medium">
                   ₹{car.rental_price_per_day} / day
                 </div>
-                <button className="text-xs text-blue-600 mt-2 font-semibold hover:underline">
-                  View Price Breakup
-                </button>
               </div>
             ))
           )}

@@ -19,6 +19,7 @@ router.post(
 router.get("/all-added-cars", CarController.getAllCars);
 router.get("/cars", CarController.getAllCars);
 router.get("/get-single-added-car-by-id/:id", CarController.getCarById);
+router.get("/get-car-by-slug/:slug", CarController.getCarBySlug); // New route for fetching car by slug
 
 // ========== UPDATE ==========
 router.put(
