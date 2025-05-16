@@ -1,100 +1,219 @@
 const Car = require("../models/CarModel");
+
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const slugify = require("slugify"); // for manual slug generation if needed
 
-// Multer config
+const carUploadDir = path.join("uploads", "cars");
+
+if (!fs.existsSync(carUploadDir)) {
+  fs.mkdirSync(carUploadDir, { recursive: true });
+}
+
 const carStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadDir = "uploads/cars";
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
+  destination: (req, file, cb) => {
+    cb(null, carUploadDir);
   },
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname));
+  filename: (req, file, cb) => {
+    const filename = `${file.fieldname}-${Date.now()}${path.extname(
+      file.originalname
+    )}`;
+    cb(null, filename);
   },
 });
 
 const carUpload = multer({ storage: carStorage });
+exports.carUpload = carUpload;
 
-// Add Car Controller
-const addCar = async (req, res) => {
+exports.createCar = async (req, res) => {
   try {
     const {
-      name,
-      brandId, // correct key name
-      location,
-      pricePerDay,
-      seats,
-      fuelType,
+      car_name,
+      slug,
+      description,
+      rental_price_per_day,
+      brand,
+      model,
+      year,
+      color,
+      fuel_type,
       transmission,
-      availability,
-      features,
+      mileage,
+      seating_capacity,
+      availability_status,
+      vendor,
+      category,
+      sub_category,
+      tags,
+      createdBy,
+      updatedBy,
     } = req.body;
 
-    // Required fields validation
-    if (!name || !brandId || !location || !pricePerDay || !seats || !fuelType || !transmission) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    // Handle image uploads
-    const image = req.files?.["image"]?.[0]?.path.replace(/\\/g, "/") || "";
-    const allImages = req.files?.["allImages"]?.map((file) =>
-      file.path.replace(/\\/g, "/")
-    ) || [];
+    const mainImage =
+      req.files["car_image"]?.[0]?.path.replace(/\\/g, "/") || "";
+    const galleryImages =
+      req.files["all_car_images"]?.map((f) => f.path.replace(/\\/g, "/")) ||
+      [];
 
     const newCar = new Car({
-      name,
-      brandId,
-      location,
-      pricePerDay,
-      seats,
-      fuelType,
+      car_name,
+      slug,
+      description,
+      rental_price_per_day,
+      car_image: mainImage,
+      all_car_images: galleryImages,
+      brand,
+      model,
+      year,
+      color,
+      fuel_type,
       transmission,
-      availability: availability === "true" || availability === true, // ensures boolean
-      features: features ? features.split(",") : [],
-      image,
-      allImages,
-      // manually generating slug (model will auto-generate if this is missing)
-      slug: slugify(name, { lower: true }),
+      mileage,
+      seating_capacity,
+      availability_status,
+      vendor,
+      category,
+      sub_category,
+      tags,
+      createdBy,
+      updatedBy,
     });
 
-    await newCar.save();
-
-    res.status(201).json({ message: "Car added successfully", car: newCar });
+    const saved = await newCar.save();
+    res.status(201).json(saved);
   } catch (error) {
-    console.error("Error adding car:", error);
-    res.status(500).json({ error: "Server error" });
+    console.error("Create Car Error:", error);
+    res.status(500).json({ message: "Failed to create car." });
   }
 };
 
-// Get all cars
-const getAllCars = async (req, res) => {
+exports.getAllCars = async (req, res) => {
   try {
-    const cars = await Car.find().populate("brandId").lean();
-
-    const modifiedCars = cars.map((car) => {
-      if (car.image) {
-        car.image = `${req.protocol}://${req.get("host")}/${car.image}`;
-      }
-      if (car.allImages && car.allImages.length > 0) {
-        car.allImages = car.allImages.map((img) => `${req.protocol}://${req.get("host")}/${img}`);
-      }
-      return car;
-    });
-
-    res.status(200).json(modifiedCars);
+    const cars = await Car.find({ isDeleted: false });
+    res.status(200).json(cars);
   } catch (error) {
-    console.error("Error fetching cars:", error);
-    res.status(500).json({ error: "Server error" });
+    console.error("Get All Cars Error:", error);
+    res.status(500).json({ message: "Failed to fetch cars." });
   }
 };
 
-module.exports = {
-  carUpload,
-  addCar,
-  getAllCars,
+exports.getCarById = async (req, res) => {
+  try {
+    const car = await Car.findById(req.params.id);
+
+    if (!car || car.isDeleted) {
+      return res.status(404).json({ message: "Car not found." });
+    }
+
+    res.status(200).json(car);
+  } catch (error) {
+    console.error("Get Car By ID Error:", error);
+    res.status(500).json({ message: "Failed to fetch car." });
+  }
+};
+
+exports.getCarBySlug = async (req, res) => {
+  try {
+    const car = await Car.findOne({ slug: req.params.slug, isDeleted: false });
+
+    if (!car) {
+      return res.status(404).json({ message: "Car not found." });
+    }
+
+    res.status(200).json(car);
+  } catch (error) {
+    console.error("Get Car By Slug Error:", error);
+    res.status(500).json({ message: "Failed to fetch car." });
+  }
+};
+
+exports.updateCarById = async (req, res) => {
+  try {
+    const {
+      car_name,
+      slug,
+      description,
+      rental_price_per_day,
+      brand,
+      model,
+      year,
+      color,
+      fuel_type,
+      transmission,
+      mileage,
+      seating_capacity,
+      availability_status,
+      tags,
+      updatedBy,
+    } = req.body;
+
+    const updatedFields = {
+      car_name,
+      slug,
+      description,
+      rental_price_per_day,
+      brand,
+      model,
+      year,
+      color,
+      fuel_type,
+      transmission,
+      mileage,
+      seating_capacity,
+      availability_status,
+      tags,
+      updatedBy,
+      updatedAt: Date.now(),
+    };
+
+    if (req.files) {
+      if (req.files["car_image"] && req.files["car_image"][0]) {
+        updatedFields.car_image = req.files["car_image"][0].path.replace(/\\/g, "/");
+      }
+
+      if (req.files["all_car_images"]) {
+        updatedFields.all_car_images = req.files["all_car_images"].map((file) =>
+          file.path.replace(/\\/g, "/")
+        );
+      }
+    }
+
+    const updated = await Car.findByIdAndUpdate(req.params.id, updatedFields, {
+      new: true,
+    });
+
+    if (!updated) {
+      return res.status(404).json({ message: "Car not found." });
+    }
+
+    res.status(200).json(updated);
+  } catch (error) {
+    console.error("Update Car Error:", error);
+    res.status(500).json({ message: "Failed to update car." });
+  }
+};
+
+exports.deleteCarById = async (req, res) => {
+  try {
+    const deleted = await Car.findByIdAndUpdate(
+      req.params.id,
+      { isDeleted: true, updatedAt: Date.now() },
+      { new: true }
+    );
+    if (!deleted)
+      return res.status(404).json({ message: "Car not found." });
+    res.status(200).json({ message: "Car deleted." });
+  } catch (error) {
+    console.error("Delete Car Error:", error);
+    res.status(500).json({ message: "Failed to delete car." });
+  }
+};
+
+exports.countAllCars = async (req, res) => {
+  try {
+    const count = await Car.countDocuments({ isDeleted: false });
+    res.status(200).json({ count });
+  } catch (err) {
+    res.status(500).json({ message: "Count failed" });
+  }
 };

@@ -1,0 +1,18 @@
+@keyframes slideText {
+  0% {
+    transform: translateX(-100%); /* Start completely outside the left edge */
+  }
+  50% {
+    transform: translateX(0); /* Fully visible in the container */
+  }
+  100% {
+    transform: translateX(100%); /* Move completely outside the right edge */
+  }
+}
+
+.animate-text {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: slideText 5s linear infinite;
+}

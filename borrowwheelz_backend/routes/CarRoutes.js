@@ -1,21 +1,40 @@
 const express = require("express");
-const {
-    carUpload,
-    addCar,
-    getAllCars,
-  } = require("../controllers/CarController");
-
 const router = express.Router();
+const CarController = require("../controllers/CarController");
 
+// Multer upload configuration
+const { carUpload } = CarController;
+
+// ========== CREATE ==========
 router.post(
   "/add-car",
   carUpload.fields([
-    { name: "image", maxCount: 1 },
-    { name: "allImages", maxCount: 5 },
+    { name: "car_image", maxCount: 1 },
+    { name: "all_car_images", maxCount: 10 },
   ]),
-  addCar
+  CarController.createCar
 );
 
-router.get("/cars", getAllCars);
+// ========== READ ==========
+router.get("/all-added-cars", CarController.getAllCars);
+router.get("/cars", CarController.getAllCars);
+router.get("/get-single-added-car-by-id/:id", CarController.getCarById);
+router.get("/get-car-by-slug/:slug", CarController.getCarBySlug); // New route for fetching car by slug
+
+// ========== UPDATE ==========
+router.put(
+  "/update-car/:id",
+  carUpload.fields([
+    { name: "car_image", maxCount: 1 },
+    { name: "all_car_images", maxCount: 10 },
+  ]),
+  CarController.updateCarById
+);
+
+// ========== DELETE ==========
+router.delete("/delete-car/:id", CarController.deleteCarById);
+
+// ========== COUNTS ==========
+router.get("/count-all-cars", CarController.countAllCars);
 
 module.exports = router;

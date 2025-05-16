@@ -1,86 +1,90 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaUserPlus } from "react-icons/fa";
-import backendGlobalRoute from "../../config/config";
+import { useNavigate } from "react-router-dom";
+import { FaUserPlus, FaEye, FaEyeSlash } from "react-icons/fa";
+import globalBackendRoute from "../../config/Config";
 
-export default function Register() {
+const Register = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    companyName: "",
-    companyAddress: "",
-    companyEmail: "",
-    gstNumber: "",
-    registerWithGST: false,
-    promotionalConsent: false, // Promotional consent
   });
-  const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
+  const { name, email, password } = formData;
 
-  const validateForm = () => {
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+
+  const validateInputs = () => {
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+
+    if (!trimmedName) return "Name cannot be empty or just spaces.";
+    if (name !== trimmedName) return "Name cannot start or end with a space.";
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!trimmedEmail.match(emailRegex)) return "Enter a valid email address.";
+    if (email !== trimmedEmail)
+      return "Email cannot start or end with a space.";
+
     const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/;
-    const formErrors = {};
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\S]{8,}$/;
+    if (!password.match(passwordRegex))
+      return "Password must be 8+ characters with uppercase, lowercase, number, and special character.";
 
-    // Email validation
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-      formErrors.email = "Invalid email format.";
-
-    // Password validation
-    if (!passwordRegex.test(formData.password))
-      formErrors.password = "Password must be strong.";
-
-    // GST-related validation
-    if (formData.registerWithGST && !formData.companyName) {
-      formErrors.companyName = "Company name is required.";
-    }
-
-    if (formData.registerWithGST && !formData.gstNumber) {
-      formErrors.gstNumber = "GST number is required.";
-    }
-
-    setErrors(formErrors);
-    return Object.keys(formErrors).length === 0;
+    return null;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      try {
-        await axios.post(`${backendGlobalRoute}/api/register`, formData);
-        alert("Registration Successful. Redirecting to login page.");
-        navigate("/login");
-      } catch (error) {
-        alert("Unable to register");
-      }
+    const validationError = validateInputs();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    try {
+      await axios.post(`${globalBackendRoute}/api/register`, {
+        name: formData.name.trim(),
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password,
+      });
+      alert("Registration successful. Redirecting to login...");
+      navigate("/login");
+    } catch {
+      setError("Registration failed. Try again.");
     }
   };
 
   return (
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8 mt-5 mb-5">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <FaUserPlus className="mx-auto h-12 w-12" />
-        <h2 className="text-center text-2xl font-bold tracking-tight text-gray-800">
-          Create a new account
-        </h2>
-      </div>
+    <div className="flex items-center justify-center px-4 mb-10">
+      <div className="bg-white w-full max-w-md p-8 space-y-6">
+        {/* Header */}
+        <div className="text-center">
+          <FaUserPlus className="mx-auto text-orange-500" size={48} />
+          <h2 className="text-2xl font-extrabold text-gray-800 mt-3">
+            Register
+          </h2>
+        </div>
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        {/* Error */}
+        {error && (
+          <p className="text-center text-red-600 font-semibold">{error}</p>
+        )}
+
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Name Input */}
           <div>
             <label
               htmlFor="name"
-              className="block text-base font-medium text-gray-900"
+              className="block text-sm font-semibold text-gray-700 mb-1"
             >
               Name
             </label>
@@ -88,19 +92,20 @@ export default function Register() {
               id="name"
               name="name"
               type="text"
+              autoComplete="name"
               value={formData.name}
               onChange={handleChange}
-              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-2 outline-gray-300 focus:outline-maroon-600 sm:text-sm"
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none"
+              placeholder="Enter your name"
             />
-            {errors.name && (
-              <p className="text-sm text-red-600">{errors.name}</p>
-            )}
           </div>
 
+          {/* Email Input */}
           <div>
             <label
               htmlFor="email"
-              className="block text-base font-medium text-gray-900"
+              className="block text-sm font-semibold text-gray-700 mb-1"
             >
               Email address
             </label>
@@ -108,137 +113,57 @@ export default function Register() {
               id="email"
               name="email"
               type="email"
-              required
+              autoComplete="email"
               value={formData.email}
               onChange={handleChange}
-              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-2 outline-gray-300 focus:outline-maroon-600 sm:text-sm"
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none"
+              placeholder="Enter your email"
             />
-            {errors.email && (
-              <p className="text-sm text-red-600">{errors.email}</p>
-            )}
           </div>
 
-          <div>
+          {/* Password Input with Toggle */}
+          <div className="relative">
             <label
               htmlFor="password"
-              className="block text-base font-medium text-gray-900"
+              className="block text-sm font-semibold text-gray-700 mb-1"
             >
               Password
             </label>
             <input
               id="password"
               name="password"
-              type="password"
-              required
+              type={showPassword ? "text" : "password"}
+              autoComplete="new-password"
               value={formData.password}
               onChange={handleChange}
-              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-2 outline-gray-300 focus:outline-maroon-600 sm:text-sm"
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none pr-10"
+              placeholder="Enter your password"
             />
-            {errors.password && (
-              <p className="text-sm text-red-600">{errors.password}</p>
-            )}
-          </div>
-
-          <div className="flex items-center mt-4">
-            <input
-              type="checkbox"
-              id="registerWithGST"
-              name="registerWithGST"
-              checked={formData.registerWithGST}
-              onChange={handleChange}
-              className="mr-2"
-            />
-            <label htmlFor="registerWithGST" className="text-gray-900">
-              Register using GST details
-            </label>
-          </div>
-
-          {formData.registerWithGST && (
-            <>
-              <div>
-                <label
-                  htmlFor="companyName"
-                  className="block text-base font-medium text-gray-900"
-                >
-                  Company Name
-                </label>
-                <input
-                  id="companyName"
-                  name="companyName"
-                  type="text"
-                  value={formData.companyName}
-                  onChange={handleChange}
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-2 outline-gray-300 focus:outline-maroon-600 sm:text-sm"
-                />
-                {errors.companyName && (
-                  <p className="text-sm text-red-600">{errors.companyName}</p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="companyAddress"
-                  className="block text-base font-medium text-gray-900"
-                >
-                  Company Address
-                </label>
-                <input
-                  id="companyAddress"
-                  name="companyAddress"
-                  type="text"
-                  value={formData.companyAddress}
-                  onChange={handleChange}
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-2 outline-gray-300 focus:outline-maroon-600 sm:text-sm"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="gstNumber"
-                  className="block text-base font-medium text-gray-900"
-                >
-                  GST Number
-                </label>
-                <input
-                  id="gstNumber"
-                  name="gstNumber"
-                  type="text"
-                  value={formData.gstNumber}
-                  onChange={handleChange}
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-2 outline-gray-300 focus:outline-maroon-600 sm:text-sm"
-                />
-              </div>
-            </>
-          )}
-
-          <div className="flex items-center mt-4">
-            <input
-              type="checkbox"
-              id="promotionalConsent"
-              name="promotionalConsent"
-              checked={formData.promotionalConsent}
-              onChange={handleChange}
-              className="mr-2"
-            />
-            <label htmlFor="promotionalConsent" className="text-gray-900">
-              I agree to receive promotional content.
-            </label>
-          </div>
-
-          <div className="flex justify-center">
-            <button
-              type="submit"
-              className="flex-none rounded-md bg-gradient-to-r from-cyan-500 via-teal-500 to-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:from-cyan-600 hover:via-teal-600 hover:to-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 w-full"
+            <span
+              onClick={togglePasswordVisibility}
+              className="absolute right-3 top-9 text-gray-500 hover:text-orange-600 cursor-pointer"
             >
-              Sign Up
-            </button>
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
           </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full py-2 px-4 bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold rounded-full shadow hover:from-red-700 hover:to-orange-600 transition"
+          >
+            Register
+          </button>
         </form>
-        <p className="mt-10 text-center text-lg text-gray-900 font-bold">
-          Already have an account ?{" "}
+
+        {/* Footer */}
+        <p className="text-center text-sm text-gray-600">
+          Already have an account?{" "}
           <a
             href="/login"
-            className="font-semibold text-red-600 hover:text-black"
+            className="text-orange-500 font-semibold hover:underline"
           >
             Sign in
           </a>
@@ -246,4 +171,6 @@ export default function Register() {
       </div>
     </div>
   );
-}
+};
+
+export default Register;
