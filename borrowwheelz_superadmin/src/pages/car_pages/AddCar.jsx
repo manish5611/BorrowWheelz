@@ -3,6 +3,25 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import ModernTextInput from "../../components/common_components/MordernTextInput";
+import {
+  FaCar,
+  FaTag,
+  FaMoneyBillWave,
+  FaList,
+  FaPalette,
+  FaGasPump,
+  FaCogs,
+  FaTachometerAlt,
+  FaUsers,
+  FaCamera,
+  FaUserTie,
+  FaLayerGroup,
+  FaBoxes,
+  FaFileImage,
+  FaCheckCircle,
+  FaExclamationCircle,
+  FaRegCalendarAlt,
+} from "react-icons/fa";
 
 export default function AddCar() {
   const navigate = useNavigate();
@@ -31,6 +50,8 @@ export default function AddCar() {
   const [message, setMessage] = useState("");
   const [subcategoriesAll, setSubcategoriesAll] = useState([]);
   const [filteredSubcategories, setFilteredSubcategories] = useState([]);
+  const [success, setSuccess] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     const fetchVendors = async () => {
@@ -95,16 +116,19 @@ export default function AddCar() {
 
     if (!carData.car_name?.trim()) {
       setMessage("Car name is required.");
+      setSuccess(false);
       return;
     }
 
     if (!carData.rental_price_per_day || isNaN(carData.rental_price_per_day)) {
       setMessage("Rental price per day is required and must be a valid number.");
+      setSuccess(false);
       return;
     }
 
     if (!carData.vendor) {
       setMessage("Vendor is required.");
+      setSuccess(false);
       return;
     }
 
@@ -126,12 +150,19 @@ export default function AddCar() {
       );
 
       if (res.status === 201) {
-        alert("Car added successfully!");
-        navigate("/all-added-cars");
+        setSuccess(true);
+        setMessage("Car added successfully!");
+        setShowToast(true);
+        setTimeout(() => {
+          setShowToast(false);
+          navigate("/all-added-cars");
+        }, 5000);
       } else {
         throw new Error("Car not created");
       }
     } catch (error) {
+      setSuccess(false);
+      setShowToast(false);
       console.error("Error adding car:", error);
       const errorMsg =
         error.response?.data?.message || "Failed to add car. Try again.";
@@ -139,17 +170,43 @@ export default function AddCar() {
     }
   };
 
+  // Animation helpers
+  const fadeIn = "animate-fadein";
+  const bounce = "animate-bounce";
+  const pulse = "animate-pulse";
+
   return (
-    <div className="max-w-5xl mx-auto py-10 px-4">
-      <h2 className="text-3xl font-bold mb-6">Add New Car</h2>
-      {message && <p className="text-red-500 text-center">{message}</p>}
+    <div className="max-w-5xl mx-auto py-10 px-4 mt-20 relative">
+      {/* Toast for success */}
+      {showToast && success && (
+        <div className="fixed top-6 right-6 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-fadein">
+          <FaCheckCircle className="text-white" />
+          <span>{message}</span>
+        </div>
+      )}
+      <h2 className="text-3xl font-bold mb-6 flex items-center gap-2">
+        <FaCar className="text-indigo-500 animate-caricon" /> Add New Car
+      </h2>
+      {/* Only show error message inline */}
+      {message && !success && (
+        <div
+          className={`flex items-center justify-center gap-2 mb-4 px-4 py-2 rounded-lg text-center bg-red-100 text-red-700 ${fadeIn}`}
+        >
+          <FaExclamationCircle className="text-red-500" />
+          <span>{message}</span>
+        </div>
+      )}
       <form
         onSubmit={handleSubmit}
-        className="space-y-6"
+        className="space-y-6 bg-white rounded-2xl shadow-xl p-8 animate-fadein"
         encType="multipart/form-data"
       >
         <ModernTextInput
-          label="Car Name *"
+          label={
+            <span className="flex items-center gap-2">
+              <FaCar className="text-indigo-400" /> Car Name *
+            </span>
+          }
           name="car_name"
           placeholder="Enter car name"
           value={carData.car_name}
@@ -157,14 +214,22 @@ export default function AddCar() {
         />
 
         <ModernTextInput
-          label="Description *"
+          label={
+            <span className="flex items-center gap-2">
+              <FaList className="text-indigo-400" /> Description *
+            </span>
+          }
           name="description"
           placeholder="Enter full description of the car"
           value={carData.description}
           onChange={handleChange}
         />
         <ModernTextInput
-          label="Slug (URL-friendly) *"
+          label={
+            <span className="flex items-center gap-2">
+              <FaTag className="text-indigo-400" /> Slug (URL-friendly) *
+            </span>
+          }
           name="slug"
           placeholder="example-car-slug"
           value={carData.slug}
@@ -172,7 +237,11 @@ export default function AddCar() {
         />
 
         <ModernTextInput
-          label="Rental Price Per Day *"
+          label={
+            <span className="flex items-center gap-2">
+              <FaMoneyBillWave className="text-green-400" /> Rental Price Per Day *
+            </span>
+          }
           name="rental_price_per_day"
           type="number"
           placeholder="Enter rental price per day"
@@ -181,21 +250,33 @@ export default function AddCar() {
         />
 
         <ModernTextInput
-          label="Brand *"
+          label={
+            <span className="flex items-center gap-2">
+              <FaTag className="text-indigo-400" /> Brand *
+            </span>
+          }
           name="brand"
           placeholder="e.g., Toyota, Honda"
           value={carData.brand}
           onChange={handleChange}
         />
         <ModernTextInput
-          label="Model *"
+          label={
+            <span className="flex items-center gap-2">
+              <FaTag className="text-indigo-400" /> Model *
+            </span>
+          }
           name="model"
           placeholder="e.g., Corolla, Civic"
           value={carData.model}
           onChange={handleChange}
         />
         <ModernTextInput
-          label="Year *"
+          label={
+            <span className="flex items-center gap-2">
+              <FaRegCalendarAlt className="text-indigo-400" /> Year *
+            </span>
+          }
           name="year"
           type="number"
           placeholder="Enter manufacturing year"
@@ -203,28 +284,44 @@ export default function AddCar() {
           onChange={handleChange}
         />
         <ModernTextInput
-          label="Color"
+          label={
+            <span className="flex items-center gap-2">
+              <FaPalette className="text-indigo-400" /> Color
+            </span>
+          }
           name="color"
           placeholder="e.g., Black, Red, Silver"
           value={carData.color}
           onChange={handleChange}
         />
         <ModernTextInput
-          label="Fuel Type *"
+          label={
+            <span className="flex items-center gap-2">
+              <FaGasPump className="text-indigo-400" /> Fuel Type *
+            </span>
+          }
           name="fuel_type"
           placeholder="e.g., Petrol, Diesel"
           value={carData.fuel_type}
           onChange={handleChange}
         />
         <ModernTextInput
-          label="Transmission *"
+          label={
+            <span className="flex items-center gap-2">
+              <FaCogs className="text-indigo-400" /> Transmission *
+            </span>
+          }
           name="transmission"
           placeholder="e.g., Manual, Automatic"
           value={carData.transmission}
           onChange={handleChange}
         />
         <ModernTextInput
-          label="Mileage (km) *"
+          label={
+            <span className="flex items-center gap-2">
+              <FaTachometerAlt className="text-indigo-400" /> Mileage (km) *
+            </span>
+          }
           name="mileage"
           type="number"
           placeholder="Enter mileage"
@@ -232,7 +329,11 @@ export default function AddCar() {
           onChange={handleChange}
         />
         <ModernTextInput
-          label="Seating Capacity *"
+          label={
+            <span className="flex items-center gap-2">
+              <FaUsers className="text-indigo-400" /> Seating Capacity *
+            </span>
+          }
           name="seating_capacity"
           type="number"
           placeholder="Enter seating capacity"
@@ -240,7 +341,11 @@ export default function AddCar() {
           onChange={handleChange}
         />
         <ModernTextInput
-          label="Tags (comma separated)"
+          label={
+            <span className="flex items-center gap-2">
+              <FaTag className="text-indigo-400" /> Tags (comma separated)
+            </span>
+          }
           name="tags"
           placeholder="e.g., new, trending, top deals"
           value={carData.tags}
@@ -248,14 +353,14 @@ export default function AddCar() {
         />
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Select Vendor *
+          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+            <FaUserTie className="text-indigo-400" /> Select Vendor *
           </label>
           <select
             name="vendor"
             value={carData.vendor}
             onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
+            className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400 transition"
           >
             <option value="">-- Select Vendor --</option>
             {vendors.map((ven) => (
@@ -267,14 +372,14 @@ export default function AddCar() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Select Category
+          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+            <FaLayerGroup className="text-indigo-400" /> Select Category
           </label>
           <select
             name="category"
             value={carData.category}
             onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
+            className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400 transition"
           >
             <option value="">-- Select Category --</option>
             {categories.map((cat) => (
@@ -286,14 +391,14 @@ export default function AddCar() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Select Subcategory
+          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+            <FaBoxes className="text-indigo-400" /> Select Subcategory
           </label>
           <select
             name="sub_category"
             value={carData.sub_category}
             onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
+            className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-400 transition"
           >
             <option value="">-- Select Subcategory --</option>
             {filteredSubcategories.map((sub) => (
@@ -305,8 +410,8 @@ export default function AddCar() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Main Car Image *
+          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+            <FaFileImage className="text-indigo-400" /> Main Car Image *
           </label>
           <input
             type="file"
@@ -314,11 +419,17 @@ export default function AddCar() {
             onChange={(e) => setCarImage(e.target.files[0])}
             className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-gray-300"
           />
+          {carImage && (
+            <div className="mt-2 flex items-center gap-2 animate-fadein">
+              <FaCamera className="text-indigo-400" />
+              <span className="text-xs text-gray-600">{carImage.name}</span>
+            </div>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Gallery Images
+          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+            <FaFileImage className="text-indigo-400" /> Gallery Images
           </label>
           <input
             type="file"
@@ -327,15 +438,58 @@ export default function AddCar() {
             onChange={(e) => setGalleryImages([...e.target.files])}
             className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-gray-300"
           />
+          {galleryImages.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2 animate-fadein">
+              {Array.from(galleryImages).map((file, idx) => (
+                <span key={idx} className="flex items-center gap-1 text-xs bg-indigo-50 px-2 py-1 rounded">
+                  <FaCamera className="text-indigo-400" />
+                  {file.name}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         <button
           type="submit"
-          className="w-full bg-gradient-to-r from-cyan-500 via-teal-500 to-indigo-500 text-white font-semibold py-2 px-4 rounded-lg shadow hover:opacity-90"
+          className="w-full bg-gradient-to-r from-cyan-500 via-teal-500 to-indigo-500 text-white font-semibold py-3 px-4 rounded-lg shadow-lg hover:opacity-90 transition-all duration-200 flex items-center justify-center gap-2 animate-fadein"
         >
-          Add Car
+          <FaCheckCircle className="text-white animate-bounce" /> Add Car
         </button>
       </form>
+      <style>
+        {`
+          @keyframes fadein {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: translateY(0);}
+          }
+          .animate-fadein {
+            animation: fadein 0.7s;
+          }
+          @keyframes caricon {
+            0% { transform: translateY(0);}
+            50% { transform: translateY(-6px);}
+            100% { transform: translateY(0);}
+          }
+          .animate-caricon {
+            animation: caricon 1.2s infinite;
+          }
+          .animate-bounce {
+            animation: bounce 1.2s infinite alternate;
+          }
+          @keyframes bounce {
+            0% { transform: translateY(0);}
+            100% { transform: translateY(-8px);}
+          }
+          .animate-pulse {
+            animation: pulse 1.5s infinite;
+          }
+          @keyframes pulse {
+            0%, 100% { opacity: 1;}
+            50% { opacity: 0.6;}
+          }
+        `}
+      </style>
     </div>
   );
 }

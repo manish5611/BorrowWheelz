@@ -24,6 +24,7 @@ import SingleBlog from "../../pages/blog_pages/SingleBlog";
 
 // contact pages.
 import ContactUs from "../../pages/contact_pages/ContactUs";
+import Reviews from "../../pages/common_pages/Reviews";
 
 // subscription page.
 import Subscriptions from "../../pages/subscription_pages/Subscriptions";
@@ -47,11 +48,16 @@ import Book from "../../pages/rent_pages/Book"
 import RentPage from "../../pages/rent_pages/RentPage";
 import SingleRentPage from "../../pages/rent_pages/SingleRentPage";
 
+// superadmin pages.
+import SuperAdminDashboard from "../../pages/superadmin_pages/SuperAdminDashboard";
+import AllUsers from "../../pages/superadmin_pages/AllUsers";
+import SingleUser from "../../pages/superadmin_pages/SingleUser";
+
 const MainLayout = () => {
   return (
     <div className="min-h-screen text-gray-900">
       <Header />
-      <main className="flex-grow w-full h-full m-0 p-0 ">
+      <main className="flex-grow py-6">
         <Routes>
           <Route
             path="/"
@@ -82,6 +88,14 @@ const MainLayout = () => {
             element={
               <PageTitle title="Contact Us">
                 <ContactUs />
+              </PageTitle>
+            }
+          />
+          <Route
+            path="/reviews"
+            element={
+              <PageTitle title="Reviews & News">
+                <Reviews />
               </PageTitle>
             }
           />
@@ -117,7 +131,7 @@ const MainLayout = () => {
           <Route
             path="/dashboard"
             element={
-              <PrivateRoute allowedRoles={["user", "superadmin"]}>
+              <PrivateRoute allowedRoles={["user"]}>
                 <PageTitle title="User Dashboard">
                   <Dashboard />
                 </PageTitle>
@@ -253,6 +267,38 @@ const MainLayout = () => {
               <PageTitle title="Car Details">
                 <SingleRentPage />
               </PageTitle>
+            }
+          />
+
+          {/* Superadmin routes */}
+          <Route
+            path="/superadmin-dashboard"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="SuperAdmin Dashboard">
+                  <SuperAdminDashboard />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/all-users"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="All Users">
+                  <AllUsers />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/single-user/:id"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="Single User">
+                  <SingleUser />
+                </PageTitle>
+              </PrivateRoute>
             }
           />
 

@@ -4,6 +4,7 @@ import axios from "axios";
 import globalBackendRoute from "../../config/Config";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle, FaBoxOpen, FaStar, FaClipboardList, FaCar, FaEnvelope, FaPhone, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import jsPDF from "jspdf";
 
 const Dashboard = () => {
   const { user, isLoggedIn } = useContext(AuthContext);
@@ -84,6 +85,59 @@ const Dashboard = () => {
       alert("Failed to update profile.");
     }
     setLoading(false);
+  };
+
+  // PDF receipt download
+  const handleDownloadReceipt = (order) => {
+    const car = order.cars?.[0]?.car || {};
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text("BorrowWheelz - Booking Receipt", 15, 20);
+    doc.setFontSize(12);
+    doc.text("-----------------------------", 15, 28);
+    doc.text(`Order ID: ${order._id}`, 15, 36);
+    doc.text(`Name: ${user?.name || ""}`, 15, 44);
+    doc.text(`Email: ${user?.email || ""}`, 15, 52);
+    doc.text(`Car: ${car.car_name || "N/A"}`, 15, 60);
+    doc.text(`Brand: ${car.brand || "N/A"}`, 15, 68);
+    doc.text(`Model: ${car.model || "N/A"}`, 15, 76);
+    doc.text(
+      `From: ${order.cars?.[0]?.fromDate ? new Date(order.cars[0].fromDate).toLocaleDateString() : ""}`,
+      15,
+      84
+    );
+    doc.text(
+      `To: ${order.cars?.[0]?.toDate ? new Date(order.cars[0].toDate).toLocaleDateString() : ""}`,
+      15,
+      92
+    );
+    doc.text(`Status: ${order.status || "pending"}`, 15, 100);
+    doc.text(
+      `Booking Date: ${order.bookingDate ? new Date(order.bookingDate).toLocaleDateString() : ""}`,
+      15,
+      108
+    );
+    // Calculate price
+    let price = 0;
+    if (
+      order.cars &&
+      order.cars[0] &&
+      order.cars[0].fromDate &&
+      order.cars[0].toDate &&
+      car.rental_price_per_day
+    ) {
+      const from = new Date(order.cars[0].fromDate);
+      const to = new Date(order.cars[0].toDate);
+      const days = Math.ceil((to - from) / (1000 * 60 * 60 * 24)) + 1;
+      price = days * car.rental_price_per_day;
+    }
+    doc.text(`Price: ₹${price}`, 15, 116);
+    doc.text(`Payment Method: ${order.paymentMethod ? order.paymentMethod.toUpperCase() : "N/A"}`, 15, 124);
+    doc.text("-----------------------------", 15, 132);
+    doc.text("Thank you for booking with us!", 15, 140);
+
+    doc.save(`BorrowWheelz_Receipt_${order._id}.pdf`);
   };
 
   // Animation for cards
@@ -227,7 +281,13 @@ const Dashboard = () => {
               <div
                 key={order._id}
                 className="flex items-center gap-4 cursor-pointer hover:bg-teal-50 rounded-xl p-2 transition group"
-                onClick={() => alert("Receipt download coming soon!")}
+                onClick={() => {
+                  if (order.status === "accepted") {
+                    handleDownloadReceipt(order);
+                  } else {
+                    alert("Receipt is available only for accepted orders.");
+                  }
+                }}
               >
                 <div className="relative">
                   <FaCar className="absolute -top-2 -left-2 text-teal-300 text-lg animate-pulse" />
@@ -257,6 +317,7 @@ const Dashboard = () => {
                     Status: {order.status || "pending"}
                   </p>
                 </div>
+                {/* No download button here, click on the order to download if accepted */}
               </div>
             ))}
           </div>

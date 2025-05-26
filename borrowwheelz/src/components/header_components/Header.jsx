@@ -126,10 +126,8 @@ const Header = () => {
           <a href="/rent" className="hover:text-blue-600 transition-colors">
             RENT CARS
           </a>
-          <a href="#" className="hover:text-blue-600 transition-colors">
-            BUY OUR PRODUCTS
-          </a>
-          <a href="#" className="hover:text-blue-600 transition-colors">
+          
+          <a href="/reviews" className="hover:text-blue-600 transition-colors">
             REVIEWS & NEWS
           </a>
         </nav>
@@ -190,7 +188,13 @@ const Header = () => {
                   <p className="text-sm">Hello, {user.name}</p>
                   <button
                     className="w-full text-left text-sm text-teal-600 hover:underline"
-                    onClick={() => navigate("/dashboard")}
+                    onClick={() => {
+                      if (user.role === "superadmin") {
+                        navigate(`/superadmin-dashboard`);
+                      } else {
+                        navigate(`/dashboard`);
+                      }
+                    }}
                   >
                     Dashboard
                   </button>

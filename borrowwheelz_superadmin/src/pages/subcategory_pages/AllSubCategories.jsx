@@ -5,6 +5,8 @@ import {
   FaTh,
   FaSearch,
   FaTrashAlt,
+  FaLayerGroup,
+  FaBoxes,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -107,14 +109,17 @@ const AllSubCategories = () => {
   
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 p-4 sm:p-6">
+    <div className="flex flex-col lg:flex-row gap-6 p-4 sm:p-6 mt-20 bg-white min-h-screen animate-fadein">
       {/* Left Sidebar - Main Categories */}
       <div className="lg:w-1/4 space-y-4">
-        <h3 className="text-xl font-bold">Main Categories</h3>
+        <h3 className="text-xl font-bold flex items-center gap-2">
+          <FaLayerGroup className="text-orange-500 animate-caticon" />
+          Main Categories
+        </h3>
         {categories.map((category) => (
           <div
             key={category._id}
-            className={`cursor-pointer flex items-center gap-4 p-2 rounded border ${
+            className={`cursor-pointer flex items-center gap-4 p-2 rounded border transition hover:scale-105 duration-200 ${
               selectedCategory === category._id
                 ? "bg-indigo-100 border-indigo-500"
                 : "hover:bg-gray-100 border-gray-300"
@@ -134,31 +139,38 @@ const AllSubCategories = () => {
       {/* Right Panel - Subcategories */}
       <div className="flex-1">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-          <h2 className="text-xl font-bold">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <FaBoxes className="text-indigo-500 animate-caticon" />
             Subcategories{" "}
             <span className="ml-2 text-gray-500 text-sm">
               ({searchedSubcategories.length})
             </span>
           </h2>
           <div className="flex flex-wrap gap-4 items-center">
-            <FaThList
-              className={`text-xl cursor-pointer ${
-                view === "list" ? "text-indigo-600" : "text-gray-600"
-              }`}
-              onClick={() => setView("list")}
-            />
-            <FaThLarge
-              className={`text-xl cursor-pointer ${
-                view === "card" ? "text-indigo-600" : "text-gray-600"
-              }`}
-              onClick={() => setView("card")}
-            />
-            <FaTh
-              className={`text-xl cursor-pointer ${
-                view === "grid" ? "text-indigo-600" : "text-gray-600"
-              }`}
-              onClick={() => setView("grid")}
-            />
+            <span className="tooltip" title="List View">
+              <FaThList
+                className={`text-xl cursor-pointer transition-transform duration-200 hover:scale-125 ${
+                  view === "list" ? "text-indigo-600 scale-125" : "text-gray-600"
+                }`}
+                onClick={() => setView("list")}
+              />
+            </span>
+            <span className="tooltip" title="Card View">
+              <FaThLarge
+                className={`text-xl cursor-pointer transition-transform duration-200 hover:scale-125 ${
+                  view === "card" ? "text-indigo-600 scale-125" : "text-gray-600"
+                }`}
+                onClick={() => setView("card")}
+              />
+            </span>
+            <span className="tooltip" title="Grid View">
+              <FaTh
+                className={`text-xl cursor-pointer transition-transform duration-200 hover:scale-125 ${
+                  view === "grid" ? "text-indigo-600 scale-125" : "text-gray-600"
+                }`}
+                onClick={() => setView("grid")}
+              />
+            </span>
             <div className="relative">
               <FaSearch className="absolute left-3 top-3 text-gray-400" />
               <input
@@ -185,13 +197,14 @@ const AllSubCategories = () => {
           {searchedSubcategories.map((sub) => (
             <div
               key={sub._id}
-              className={`relative bg-white rounded-lg p-4 shadow hover:shadow-lg transition ${
-                view === "list" ? "flex items-center gap-4" : "flex flex-col"
+              className={`relative bg-white rounded-lg p-4 shadow hover:shadow-xl hover:scale-105 transition duration-200 ${
+                view === "list" ? "flex items-center gap-4" : "flex flex-col animate-fadein"
               }`}
             >
               <button
-                className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                className="absolute top-2 right-2 text-red-500 hover:text-red-700 transition"
                 onClick={() => deleteSubCategory(sub._id)}
+                title="Delete Subcategory"
               >
                 <FaTrashAlt />
               </button>
@@ -203,10 +216,12 @@ const AllSubCategories = () => {
                     : "flex flex-col items-center"
                 }
               >
-                <div className="text-sm font-semibold text-gray-800">
+                <div className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                  <FaBoxes className="text-indigo-400" />
                   {sub.subcategory_name}
                 </div>
-                <div className="text-xs text-gray-500 italic mt-1">
+                <div className="text-xs text-gray-500 italic mt-1 flex items-center gap-1">
+                  <FaLayerGroup className="text-orange-400" />
                   Category: {getCategoryName(sub.category)}
                 </div>
               </Link>
@@ -214,6 +229,21 @@ const AllSubCategories = () => {
           ))}
         </div>
       </div>
+      <style>
+        {`
+          @keyframes fadein {
+            from { opacity: 0; transform: translateY(30px);}
+            to { opacity: 1; transform: translateY(0);}
+          }
+          .animate-fadein { animation: fadein 0.7s; }
+          @keyframes caticon {
+            0% { transform: translateY(0);}
+            50% { transform: translateY(-6px);}
+            100% { transform: translateY(0);}
+          }
+          .animate-caticon { animation: caticon 1.2s infinite; }
+        `}
+      </style>
     </div>
   );
 };

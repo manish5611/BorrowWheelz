@@ -71,7 +71,7 @@ export default function AddBlog() {
     }
 
     try {
-      await axios.post(`${globalBackendRoute}/api/add-blog`, blogForm, {
+      await axios.post(`${globalBackendRoute}/api/blog/add-blog`, blogForm, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       alert("✅ Blog added successfully!");
@@ -84,7 +84,7 @@ export default function AddBlog() {
   };
 
   return (
-    <div className="containerWidth my-8">
+    <div className="containerWidth my-8 mt-20">
       <div className="bg-white shadow-md rounded-xl p-6 sm:p-8 max-w-4xl mx-auto">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
           📢 Add New Blog

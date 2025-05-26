@@ -9,12 +9,12 @@ const {
 const router = express.Router();
 
 // Add a new blog
-router.post("/add-blog", blogUpload.single("featuredImage"), addBlog);
+router.post("/blog/add-blog", blogUpload.single("featuredImage"), addBlog);
 
 // Fetch all blogs
-router.get("/all-blogs", getAllBlogs);
+router.get("/blog/all-blogs", getAllBlogs);
 
 // Fetch a single blog by ID
-router.get("/single-blogs/:id", getBlogById);
+router.get("/blog/single-blogs/:id", getBlogById);
 
 module.exports = router;

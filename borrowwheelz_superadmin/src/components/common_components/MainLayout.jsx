@@ -9,6 +9,7 @@ import PageTitle from "./PageTitle";
 // Pages
 import Homepage from "../../pages/common_pages/Homepage";
 import PageNotFound from "../../pages/common_pages/PageNotFound";
+import AddBlog from "../../pages/blog_pages/AddBlog";
 // contact page.
 import ContactUs from "../../pages/common_pages/ContactUs";
 import AllMessages from "../../pages/contact_pages/AllMessages";
@@ -182,6 +183,18 @@ const MainLayout = () => {
               </PrivateRoute>
             }
           />
+
+          <Route
+            path="/add-blog"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="Add Blog">
+                  <AddBlog />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+
           <Route
             path="/admin-dashboard"
             element={

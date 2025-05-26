@@ -111,7 +111,7 @@ const AddOutlet = () => {
   );
 
   return (
-    <div className="bg-white py-10">
+    <div className="bg-white py-10 mt-20">
       <div className="compactWidth">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">

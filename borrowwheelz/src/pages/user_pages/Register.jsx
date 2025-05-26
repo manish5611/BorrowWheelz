@@ -63,23 +63,33 @@ const Register = () => {
   };
 
   return (
-    <div className="flex items-center justify-center px-4 mb-10">
-      <div className="bg-white w-full max-w-md p-8 space-y-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-100 via-white to-indigo-100 relative py-32 mb-[-20px]">
+      {/* Animated Circles */}
+      <div className="absolute top-0 left-0 w-80 h-80 bg-gradient-to-br from-orange-400 to-pink-400 opacity-30 rounded-full blur-3xl animate-float1 z-0 "></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-br from-indigo-400 to-teal-400 opacity-30 rounded-full blur-3xl animate-float2 z-0"></div>
+      <div className="absolute top-1/2 left-1/2 w-40 h-40 bg-gradient-to-br from-yellow-300 to-orange-400 opacity-20 rounded-full blur-2xl animate-float3 z-0"></div>
+
+      <div className="bg-white/90 w-full max-w-md p-10 space-y-8 rounded-2xl shadow-2xl border border-orange-100 z-10 animate-fadein">
         {/* Header */}
         <div className="text-center">
-          <FaUserPlus className="mx-auto text-orange-500" size={48} />
-          <h2 className="text-2xl font-extrabold text-gray-800 mt-3">
-            Register
+          <span className="inline-block animate-bounce">
+            <FaUserPlus className="mx-auto text-orange-500 drop-shadow-lg" size={54} />
+          </span>
+          <h2 className="text-3xl font-extrabold text-gray-800 mt-2 tracking-tight font-serif">
+            Create Account
           </h2>
+          <p className="text-gray-500 mt-1 text-sm">
+            Join <span className="font-bold text-orange-500">BorrowWheelz</span> and start your journey!
+          </p>
         </div>
 
         {/* Error */}
         {error && (
-          <p className="text-center text-red-600 font-semibold">{error}</p>
+          <p className="text-center text-red-600 font-semibold animate-shake">{error}</p>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-7">
           {/* Name Input */}
           <div>
             <label
@@ -96,7 +106,7 @@ const Register = () => {
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none"
+              className="w-full px-4 py-2 border border-orange-200 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none bg-orange-50/50 transition"
               placeholder="Enter your name"
             />
           </div>
@@ -117,7 +127,7 @@ const Register = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none"
+              className="w-full px-4 py-2 border border-orange-200 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none bg-orange-50/50 transition"
               placeholder="Enter your email"
             />
           </div>
@@ -138,12 +148,15 @@ const Register = () => {
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none pr-10"
+              className="w-full px-4 py-2 border border-orange-200 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none pr-10 bg-orange-50/50 transition"
               placeholder="Enter your password"
             />
             <span
               onClick={togglePasswordVisibility}
-              className="absolute right-3 top-9 text-gray-500 hover:text-orange-600 cursor-pointer"
+              className="absolute right-3 top-9 text-gray-500 hover:text-orange-600 cursor-pointer transition"
+              tabIndex={0}
+              role="button"
+              aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
@@ -152,11 +165,18 @@ const Register = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-2 px-4 bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold rounded-full shadow hover:from-red-700 hover:to-orange-600 transition"
+            className="w-full py-2 px-4 bg-gradient-to-r from-orange-500 to-indigo-500 text-white font-bold rounded-full shadow-lg hover:from-orange-600 hover:to-indigo-600 transition-all duration-200 transform hover:scale-105 active:scale-95 animate-glow"
           >
             Register
           </button>
         </form>
+
+        {/* Divider */}
+        <div className="flex items-center gap-2 my-2">
+          <div className="flex-1 h-px bg-gradient-to-r from-orange-200 via-gray-200 to-indigo-200" />
+          <span className="text-xs text-gray-400">or</span>
+          <div className="flex-1 h-px bg-gradient-to-l from-orange-200 via-gray-200 to-indigo-200" />
+        </div>
 
         {/* Footer */}
         <p className="text-center text-sm text-gray-600">
@@ -169,6 +189,43 @@ const Register = () => {
           </a>
         </p>
       </div>
+
+      {/* Animations */}
+      <style>
+        {`
+          @keyframes float1 {
+            0%, 100% { transform: translateY(0) scale(1);}
+            50% { transform: translateY(-30px) scale(1.05);}
+          }
+          @keyframes float2 {
+            0%, 100% { transform: translateY(0) scale(1);}
+            50% { transform: translateY(30px) scale(1.08);}
+          }
+          @keyframes float3 {
+            0%, 100% { transform: translateY(0) scale(1);}
+            50% { transform: translateY(-15px) scale(1.03);}
+          }
+          .animate-float1 { animation: float1 7s ease-in-out infinite; }
+          .animate-float2 { animation: float2 8s ease-in-out infinite; }
+          .animate-float3 { animation: float3 6s ease-in-out infinite; }
+          @keyframes fadein {
+            from { opacity: 0; transform: translateY(40px);}
+            to { opacity: 1; transform: translateY(0);}
+          }
+          .animate-fadein { animation: fadein 1s cubic-bezier(.4,0,.2,1) both; }
+          @keyframes shake {
+            0%, 100% { transform: translateX(0);}
+            20%, 60% { transform: translateX(-6px);}
+            40%, 80% { transform: translateX(6px);}
+          }
+          .animate-shake { animation: shake 0.4s; }
+          @keyframes glow {
+            0%, 100% { box-shadow: 0 0 0px 0 #fbbf24, 0 0 0px 0 #6366f1;}
+            50% { box-shadow: 0 0 16px 4px #fbbf24, 0 0 24px 8px #6366f1;}
+          }
+          .animate-glow { animation: glow 2.5s infinite alternate; }
+        `}
+      </style>
     </div>
   );
 };

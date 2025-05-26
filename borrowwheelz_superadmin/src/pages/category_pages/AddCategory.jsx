@@ -42,7 +42,7 @@ export default function AddCategory() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8 mt-20">
       <div className="top_header flex justify-between items-center ">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">
           Add Main Category
