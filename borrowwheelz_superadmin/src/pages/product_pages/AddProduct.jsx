@@ -137,7 +137,7 @@ export default function AddProduct() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto py-10 px-4">
+    <div className="max-w-5xl mx-auto py-10 px-4 mt-20">
       <h2 className="text-3xl font-bold mb-6">Add New Product</h2>
       {message && <p className="text-red-500 text-center">{message}</p>}
       <form

@@ -92,6 +92,13 @@ const Book = () => {
       navigate("/login", { state: { message: "Please log in to confirm your booking." } });
       return;
     }
+
+    // Check car availability before booking
+    if (!car.availability_status) {
+      alert("Sorry, this car is not available for booking.");
+      return;
+    }
+
     let cardExpiry = "";
     if (paymentMethod === "card") {
       const mm = cardDetails.cardExpiryMM.padStart(2, "0");
@@ -125,7 +132,7 @@ const Book = () => {
 
     try {
       await axios.post(`${globalBackendRoute}/api/book/add`, bookingPayload);
-      navigate("/thank-you");
+      navigate("/dashboard");
     } catch (err) {
       alert("Failed to book. Please try again.");
     }

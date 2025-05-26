@@ -41,7 +41,8 @@ export const AuthProvider = ({ children }) => {
       if (decoded && decoded.id) {
         fetchUserProfile(decoded.id).then((profile) => {
           if (profile && profile._id) {
-            setUser(profile);
+            // Ensure role is present in user object
+            setUser({ ...profile, role: decoded.role || profile.role });
             setIsLoggedIn(true);
           } else {
             setUser(null);
@@ -68,7 +69,8 @@ export const AuthProvider = ({ children }) => {
     if (decoded && decoded.id) {
       const profile = await fetchUserProfile(decoded.id);
       if (profile && profile._id) {
-        setUser(profile);
+        // Ensure role is present in user object
+        setUser({ ...profile, role: decoded.role || profile.role });
         setIsLoggedIn(true);
       } else {
         setUser(null);
@@ -142,6 +144,8 @@ export const PublicRoute = ({ children }) => {
 
   if (isLoggedIn && user?.role) {
     switch (user.role) {
+      case "superadmin":
+        return <Navigate to="/superadmin-dashboard" />;
       case "user":
         return <Navigate to="/dashboard" />;
       default:

@@ -54,9 +54,6 @@ const Homepage = () => {
         <CarsByFuelType />
       </div>
 
-      <CarProducts />
-      <FeaturedCarAccessories />
-
     </div>
   )
 }

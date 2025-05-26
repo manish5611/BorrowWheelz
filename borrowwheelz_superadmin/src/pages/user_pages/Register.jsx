@@ -1,127 +1,7 @@
-// import React, { useState } from "react";
-// import axios from "axios";
-// import { useNavigate } from "react-router-dom";
-// import { FaUserPlus } from "react-icons/fa";
-// import globalBackendRoute from "../../config/Config";
-
-// const Register = () => {
-//   const navigate = useNavigate();
-//   const [formData, setFormData] = useState({
-//     name: "",
-//     email: "",
-//     password: "",
-//   });
-//   const [error, setError] = useState("");
-//   const { name, email, password } = formData;
-
-//   const handleChange = (e) =>
-//     setFormData({ ...formData, [e.target.name]: e.target.value });
-
-//   const validateInputs = () => {
-//     const trimmedName = name.trim();
-//     const trimmedEmail = email.trim();
-
-//     if (!trimmedName) return "Name cannot be empty or just spaces.";
-//     if (name !== trimmedName) return "Name cannot start or end with a space.";
-
-//     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//     if (!trimmedEmail.match(emailRegex)) return "Enter a valid email address.";
-//     if (email !== trimmedEmail)
-//       return "Email cannot start or end with a space.";
-
-//     const passwordRegex =
-//       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\S]{8,}$/;
-//     if (!password.match(passwordRegex))
-//       return "Password must be 8+ characters with uppercase, lowercase, number, and special character.";
-
-//     return null;
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     const validationError = validateInputs();
-//     if (validationError) {
-//       setError(validationError);
-//       return;
-//     }
-
-//     try {
-//       await axios.post(`${globalBackendRoute}/api/register`, {
-//         name: formData.name.trim(),
-//         email: formData.email.trim().toLowerCase(),
-//         password: formData.password,
-//       });
-//       alert("Registration successful. Redirecting to login.");
-//       navigate("/login");
-//     } catch {
-//       setError("Registration failed. Try again.");
-//     }
-//   };
-
-//   const renderInput = (label, type, id) => (
-//     <div>
-//       <label htmlFor={id} className="formLabel">
-//         {label}
-//       </label>
-//       <input
-//         id={id}
-//         name={id}
-//         type={type}
-//         value={formData[id]}
-//         onChange={handleChange}
-//         required
-//         autoComplete={
-//           id === "password" ? "new-password" : id === "email" ? "email" : "name"
-//         } // ✅ Correct autocomplete based on field
-//         className="mt-2 formInput"
-//         placeholder={`Enter your ${id}`}
-//       />
-//     </div>
-//   );
-
-//   return (
-//     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-//       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-//         <FaUserPlus className="iconPrimary" />
-//         <h2 className="mt-6 text-center headingTextMobile lg:headingText">
-//           Register a new account
-//         </h2>
-//       </div>
-
-//       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-sm">
-//         {error && <p className="errorText mb-4">{error}</p>}
-
-//         <form onSubmit={handleSubmit} className="space-y-5">
-//           {renderInput("Name", "text", "name")}
-//           {renderInput("Email address", "email", "email")}
-//           {renderInput("Password", "password", "password")}
-
-//           <button type="submit" className="primaryBtn">
-//             Register
-//           </button>
-//         </form>
-
-//         <p className="mt-6 text-center paragraphTextMobile lg:paragraphText">
-//           Already have an account?{" "}
-//           <a href="/login" className="linkTextMobile lg:linkText">
-//             Sign in
-//           </a>
-//         </p>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Register;
-
-// without the eye toggle till here ..
-
-// with the password eye toggle option .
-
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { FaUserPlus, FaEye, FaEyeSlash } from "react-icons/fa"; // ✅ Added Eye Icons
+import { FaUserPlus, FaEye, FaEyeSlash } from "react-icons/fa";
 import globalBackendRoute from "../../config/Config";
 
 const Register = () => {
@@ -132,11 +12,14 @@ const Register = () => {
     password: "",
   });
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // ✅ Added state
+  const [showPassword, setShowPassword] = useState(false);
+
   const { name, email, password } = formData;
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   const validateInputs = () => {
     const trimmedName = name.trim();
@@ -172,95 +55,177 @@ const Register = () => {
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
       });
-      alert("Registration successful. Redirecting to login.");
+      alert("Registration successful. Redirecting to login...");
       navigate("/login");
     } catch {
       setError("Registration failed. Try again.");
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
-
-  const renderInput = (label, type, id) => {
-    if (id === "password") {
-      return (
-        <div className="relative">
-          <label htmlFor={id} className="formLabel">
-            {label}
-          </label>
-          <input
-            id={id}
-            name={id}
-            type={showPassword ? "text" : "password"} // 👁️ Toggle password type
-            value={formData[id]}
-            onChange={handleChange}
-            required
-            autoComplete="new-password"
-            className="mt-2 formInput pr-10" // padding-right for icon
-            placeholder={`Enter your ${id}`}
-          />
-          {/* Eye icon */}
-          <span
-            onClick={togglePasswordVisibility}
-            className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
-          >
-            {showPassword ? <FaEyeSlash /> : <FaEye />}
-          </span>
-        </div>
-      );
-    } else {
-      return (
-        <div>
-          <label htmlFor={id} className="formLabel">
-            {label}
-          </label>
-          <input
-            id={id}
-            name={id}
-            type={type}
-            value={formData[id]}
-            onChange={handleChange}
-            required
-            autoComplete={id === "email" ? "email" : "name"}
-            className="mt-2 formInput"
-            placeholder={`Enter your ${id}`}
-          />
-        </div>
-      );
-    }
-  };
-
   return (
-    <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <FaUserPlus className="iconPrimary" />
-        <h2 className="mt-6 text-center headingTextMobile lg:headingText">
-          Register a new account
-        </h2>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-100 via-white to-indigo-100 relative py-32 mb-[-20px]">
+      {/* Animated Circles */}
+      <div className="absolute top-0 left-0 w-80 h-80 bg-gradient-to-br from-orange-400 to-pink-400 opacity-30 rounded-full blur-3xl animate-float1 z-0 "></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-br from-indigo-400 to-teal-400 opacity-30 rounded-full blur-3xl animate-float2 z-0"></div>
+      <div className="absolute top-1/2 left-1/2 w-40 h-40 bg-gradient-to-br from-yellow-300 to-orange-400 opacity-20 rounded-full blur-2xl animate-float3 z-0"></div>
 
-      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-sm">
-        {error && <p className="errorText mb-4">{error}</p>}
+      <div className="bg-white/90 w-full max-w-md p-10 space-y-8 rounded-2xl shadow-2xl border border-orange-100 z-10 animate-fadein">
+        {/* Header */}
+        <div className="text-center">
+          <span className="inline-block animate-bounce">
+            <FaUserPlus className="mx-auto text-orange-500 drop-shadow-lg" size={54} />
+          </span>
+          <h2 className="text-3xl font-extrabold text-gray-800 mt-2 tracking-tight font-serif">
+            Create Account
+          </h2>
+          <p className="text-gray-500 mt-1 text-sm">
+            Join <span className="font-bold text-orange-500">BorrowWheelz</span> and start your journey!
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {renderInput("Name", "text", "name")}
-          {renderInput("Email address", "email", "email")}
-          {renderInput("Password", "password", "password")}
+        {/* Error */}
+        {error && (
+          <p className="text-center text-red-600 font-semibold animate-shake">{error}</p>
+        )}
 
-          <button type="submit" className="primaryBtn">
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-7">
+          {/* Name Input */}
+          <div>
+            <label
+              htmlFor="name"
+              className="block text-sm font-semibold text-gray-700 mb-1"
+            >
+              Name
+            </label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              autoComplete="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-orange-200 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none bg-orange-50/50 transition"
+              placeholder="Enter your name"
+            />
+          </div>
+
+          {/* Email Input */}
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-semibold text-gray-700 mb-1"
+            >
+              Email address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-orange-200 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none bg-orange-50/50 transition"
+              placeholder="Enter your email"
+            />
+          </div>
+
+          {/* Password Input with Toggle */}
+          <div className="relative">
+            <label
+              htmlFor="password"
+              className="block text-sm font-semibold text-gray-700 mb-1"
+            >
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="new-password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-orange-200 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none pr-10 bg-orange-50/50 transition"
+              placeholder="Enter your password"
+            />
+            <span
+              onClick={togglePasswordVisibility}
+              className="absolute right-3 top-9 text-gray-500 hover:text-orange-600 cursor-pointer transition"
+              tabIndex={0}
+              role="button"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full py-2 px-4 bg-gradient-to-r from-orange-500 to-indigo-500 text-white font-bold rounded-full shadow-lg hover:from-orange-600 hover:to-indigo-600 transition-all duration-200 transform hover:scale-105 active:scale-95 animate-glow"
+          >
             Register
           </button>
         </form>
 
-        <p className="mt-6 text-center paragraphTextMobile lg:paragraphText">
+        {/* Divider */}
+        <div className="flex items-center gap-2 my-2">
+          <div className="flex-1 h-px bg-gradient-to-r from-orange-200 via-gray-200 to-indigo-200" />
+          <span className="text-xs text-gray-400">or</span>
+          <div className="flex-1 h-px bg-gradient-to-l from-orange-200 via-gray-200 to-indigo-200" />
+        </div>
+
+        {/* Footer */}
+        <p className="text-center text-sm text-gray-600">
           Already have an account?{" "}
-          <a href="/login" className="linkTextMobile lg:linkText">
+          <a
+            href="/login"
+            className="text-orange-500 font-semibold hover:underline"
+          >
             Sign in
           </a>
         </p>
       </div>
+
+      {/* Animations */}
+      <style>
+        {`
+          @keyframes float1 {
+            0%, 100% { transform: translateY(0) scale(1);}
+            50% { transform: translateY(-30px) scale(1.05);}
+          }
+          @keyframes float2 {
+            0%, 100% { transform: translateY(0) scale(1);}
+            50% { transform: translateY(30px) scale(1.08);}
+          }
+          @keyframes float3 {
+            0%, 100% { transform: translateY(0) scale(1);}
+            50% { transform: translateY(-15px) scale(1.03);}
+          }
+          .animate-float1 { animation: float1 7s ease-in-out infinite; }
+          .animate-float2 { animation: float2 8s ease-in-out infinite; }
+          .animate-float3 { animation: float3 6s ease-in-out infinite; }
+          @keyframes fadein {
+            from { opacity: 0; transform: translateY(40px);}
+            to { opacity: 1; transform: translateY(0);}
+          }
+          .animate-fadein { animation: fadein 1s cubic-bezier(.4,0,.2,1) both; }
+          @keyframes shake {
+            0%, 100% { transform: translateX(0);}
+            20%, 60% { transform: translateX(-6px);}
+            40%, 80% { transform: translateX(6px);}
+          }
+          .animate-shake { animation: shake 0.4s; }
+          @keyframes glow {
+            0%, 100% { box-shadow: 0 0 0px 0 #fbbf24, 0 0 0px 0 #6366f1;}
+            50% { box-shadow: 0 0 16px 4px #fbbf24, 0 0 24px 8px #6366f1;}
+          }
+          .animate-glow { animation: glow 2.5s infinite alternate; }
+        `}
+      </style>
     </div>
   );
 };

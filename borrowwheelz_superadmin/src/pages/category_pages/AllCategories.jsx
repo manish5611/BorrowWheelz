@@ -66,19 +66,42 @@ export default function AllCategories() {
   });
 
   return (
-    <div className="fullWidth py-6">
+    <div className="fullWidth py-6 mt-20 bg-white min-h-screen animate-fadein">
       <div className="containerWidth">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-          <h2 className="headingText">
+          <h2 className="headingText flex items-center gap-2">
+            <FaTh className="text-orange-500 animate-caticon" />
             All Categories
-            <span className="text-sm text-gray-500 ml-2">
+            <span className="text-sm text-gray-500 ml-2 flex items-center gap-1">
+              <FaThLarge className="text-indigo-400" />
               Showing {filteredCategories.length} of {totalCount}
             </span>
           </h2>
           <div className="flex items-center flex-wrap gap-4">
-            <FaThList className={`text-xl cursor-pointer ${view === "list" ? "text-indigo-600" : "text-gray-600"}`} onClick={() => setView("list")} />
-            <FaThLarge className={`text-xl cursor-pointer ${view === "card" ? "text-indigo-600" : "text-gray-600"}`} onClick={() => setView("card")} />
-            <FaTh className={`text-xl cursor-pointer ${view === "grid" ? "text-indigo-600" : "text-gray-600"}`} onClick={() => setView("grid")} />
+            <span className="tooltip" title="List View">
+              <FaThList
+                className={`text-xl cursor-pointer transition-transform duration-200 hover:scale-125 ${
+                  view === "list" ? "text-indigo-600 scale-125" : "text-gray-600"
+                }`}
+                onClick={() => setView("list")}
+              />
+            </span>
+            <span className="tooltip" title="Card View">
+              <FaThLarge
+                className={`text-xl cursor-pointer transition-transform duration-200 hover:scale-125 ${
+                  view === "card" ? "text-indigo-600 scale-125" : "text-gray-600"
+                }`}
+                onClick={() => setView("card")}
+              />
+            </span>
+            <span className="tooltip" title="Grid View">
+              <FaTh
+                className={`text-xl cursor-pointer transition-transform duration-200 hover:scale-125 ${
+                  view === "grid" ? "text-indigo-600 scale-125" : "text-gray-600"
+                }`}
+                onClick={() => setView("grid")}
+              />
+            </span>
             <div className="relative w-full sm:w-auto">
               <FaSearch className="absolute left-3 top-3 text-gray-400" />
               <input
@@ -90,14 +113,16 @@ export default function AllCategories() {
               />
             </div>
             <Link to="/add-category">
-              <button className="fileUploadBtn">Add Category</button>
+              <button className="fileUploadBtn flex items-center gap-2">
+                <FaThLarge className="text-indigo-400" /> Add Category
+              </button>
             </Link>
           </div>
         </div>
 
         <div className="mt-6">
           {filteredCategories.length === 0 ? (
-            <p className="text-center text-gray-500">No categories found.</p>
+            <p className="text-center text-gray-500 animate-fadein">No categories found.</p>
           ) : (
             <div className={
               view === "list"
@@ -112,15 +137,16 @@ export default function AllCategories() {
                 return (
                   <div
                     key={category._id}
-                    className={`relative bg-white rounded-lg p-4 transition hover:shadow-lg ${
+                    className={`relative bg-white rounded-lg p-4 transition hover:shadow-xl hover:scale-105 duration-200 ${
                       view === "list"
                         ? "flex items-center space-x-4 shadow"
-                        : "flex flex-col"
+                        : "flex flex-col animate-fadein"
                     }`}
                   >
                     <button
-                      className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                      className="absolute top-2 right-2 text-red-500 hover:text-red-700 transition"
                       onClick={() => deleteCategory(category._id)}
+                      title="Delete Category"
                     >
                       <FaTrashAlt />
                     </button>
@@ -139,19 +165,19 @@ export default function AllCategories() {
                           onError={(e) => {
                             e.currentTarget.src = "/images/default-category.jpg";
                           }}
-                          className={`$${
+                          className={`${
                             view === "list"
                               ? "w-20 h-20"
                               : view === "card"
                               ? "w-full h-40"
                               : "w-full h-32"
-                          } object-cover rounded-md mb-2`}
+                          } object-cover rounded-md mb-2 transition-transform duration-300 hover:scale-105`}
                         />
                       ) : (
                         <img
                           src="/images/default-category.jpg"
                           alt="Default"
-                          className={`$${
+                          className={`${
                             view === "list"
                               ? "w-20 h-20"
                               : view === "card"
@@ -161,12 +187,13 @@ export default function AllCategories() {
                         />
                       )}
                       <h3
-                        className={`$${
+                        className={`${
                           view === "list"
                             ? "text-lg font-semibold text-left"
                             : "text-md font-semibold text-center"
-                        } text-gray-900`}
+                        } text-gray-900 flex items-center gap-2`}
                       >
+                        <FaThLarge className="text-indigo-300" />
                         {category.category_name}
                       </h3>
                     </Link>
@@ -177,6 +204,21 @@ export default function AllCategories() {
           )}
         </div>
       </div>
+      <style>
+        {`
+          @keyframes fadein {
+            from { opacity: 0; transform: translateY(30px);}
+            to { opacity: 1; transform: translateY(0);}
+          }
+          .animate-fadein { animation: fadein 0.7s; }
+          @keyframes caticon {
+            0% { transform: translateY(0);}
+            50% { transform: translateY(-6px);}
+            100% { transform: translateY(0);}
+          }
+          .animate-caticon { animation: caticon 1.2s infinite; }
+        `}
+      </style>
     </div>
   );
 }

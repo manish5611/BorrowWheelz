@@ -51,7 +51,7 @@ export default function AddSubCategory() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8 mt-20">
       <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center sm:text-left">
         Add Subcategory
       </h2>
