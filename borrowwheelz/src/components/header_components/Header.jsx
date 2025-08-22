@@ -23,8 +23,9 @@ const Header = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [allCars, setAllCars] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
 
   const images = [rent, premium, car];
 
@@ -40,43 +41,63 @@ const Header = () => {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const fetchCars = async () => {
-      try {
-        const res = await axios.get(`${globalBackendRoute}/api/all-added-cars`);
-        setAllCars(res.data);
-      } catch (err) {
-        console.error("Failed to fetch cars:", err.message);
-      }
-    };
-
-    fetchCars();
-  }, []);
-
-  const handleSearchChange = (e) => {
+  const handleSearchChange = async (e) => {
     const query = e.target.value;
     setSearchQuery(query);
+    setActiveIndex(-1);
 
     if (query.trim() === "") {
-      setSearchResults(allCars.slice(0, 4)); // Show initial suggestions
+      setLoading(true);
+      try {
+        const res = await axios.get(`${globalBackendRoute}/api/all-added-cars`);
+        setSearchResults(res.data.slice(0, 4));
+      } catch {
+        setSearchResults([]);
+      }
+      setLoading(false);
       return;
     }
 
-    const filteredCars = allCars
-      .filter((car) =>
-        car.car_name.toLowerCase().includes(query.toLowerCase())
-      )
-      .slice(0, 4); // Limit to 4 results
-    setSearchResults(filteredCars);
+    setLoading(true);
+    try {
+      const res = await axios.get(
+        `${globalBackendRoute}/api/search-cars?q=${encodeURIComponent(query)}`
+      );
+      setSearchResults(res.data.slice(0, 4));
+    } catch (error) {
+      setSearchResults([]);
+    }
+    setLoading(false);
   };
 
-  const handleSearchFocus = () => {
+  const handleSearchFocus = async () => {
     setShowSuggestions(true);
-    setSearchResults(allCars.slice(0, 4)); // Show initial suggestions
+    setActiveIndex(-1);
+    setLoading(true);
+    try {
+      const res = await axios.get(`${globalBackendRoute}/api/all-added-cars`);
+      setSearchResults(res.data.slice(0, 4));
+    } catch {
+      setSearchResults([]);
+    }
+    setLoading(false);
   };
 
   const handleSearchBlur = () => {
-    setTimeout(() => setShowSuggestions(false), 200); // Delay to allow click on suggestions
+    setTimeout(() => setShowSuggestions(false), 200);
+  };
+
+  // Keyboard navigation for suggestions
+  const handleKeyDown = (e) => {
+    if (!showSuggestions || searchResults.length === 0) return;
+    if (e.key === "ArrowDown") {
+      setActiveIndex((prev) => (prev < searchResults.length - 1 ? prev + 1 : 0));
+    } else if (e.key === "ArrowUp") {
+      setActiveIndex((prev) => (prev > 0 ? prev - 1 : searchResults.length - 1));
+    } else if (e.key === "Enter" && activeIndex >= 0) {
+      navigate(`/singlerent/${searchResults[activeIndex].slug}`);
+      setShowSuggestions(false);
+    }
   };
 
   const handleLocationSelect = (city) => {
@@ -142,25 +163,51 @@ const Header = () => {
             onChange={handleSearchChange}
             onFocus={handleSearchFocus}
             onBlur={handleSearchBlur}
+            onKeyDown={handleKeyDown}
             className="pl-3 pr-10 py-1.5 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-60 bg-gray-50"
           />
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-          {showSuggestions && searchResults.length > 0 && (
-            <div className="absolute top-full mt-2 w-full bg-white shadow-lg rounded-lg z-50">
-              {searchResults.map((car) => (
-                <div
-                  key={car._id}
-                  className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => navigate(`/singlerent/${car.slug}`)}
-                >
-                  <img
-                    src={`${globalBackendRoute}/${car.car_image}`}
-                    alt={car.car_name}
-                    className="h-10 w-10 object-cover rounded-full mr-3"
-                  />
-                  <span className="text-sm text-gray-700">{car.car_name}</span>
+          {showSuggestions && (
+            <div className="absolute top-full mt-2 w-full bg-white shadow-xl rounded-xl z-50 border border-gray-200">
+              {loading ? (
+                <div className="flex items-center justify-center p-4 text-gray-400">
+                  <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                  </svg>
+                  Searching...
                 </div>
-              ))}
+              ) : searchResults.length > 0 ? (
+                searchResults.map((car, idx) => (
+                  <div
+                    key={car._id}
+                    className={`flex items-center gap-3 p-2 hover:bg-blue-50 cursor-pointer transition-all rounded-lg ${
+                      idx === activeIndex ? "bg-blue-100" : ""
+                    }`}
+                    onClick={() => navigate(`/singlerent/${car.slug}`)}
+                    onMouseEnter={() => setActiveIndex(idx)}
+                  >
+                    <img
+                      src={`${globalBackendRoute}/uploads/cars/${car.car_image?.split("/").pop()}`}
+                      alt={car.car_name}
+                      className="h-9 w-14 object-contain bg-gray-100 rounded-md border"
+                    />
+                    <div className="flex flex-col flex-1">
+                      <span className="text-sm font-medium text-gray-800 truncate">
+                        {car.car_name}
+                      </span>
+                      <span className="text-xs text-blue-600 font-semibold">
+                        ₹{car.rental_price_per_day} /day
+                      </span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center p-4 text-gray-500">
+                  <span className="text-sm font-medium">No cars found</span>
+                  <span className="text-xs mt-1">Try searching with a different keyword.</span>
+                </div>
+              )}
             </div>
           )}
         </div>

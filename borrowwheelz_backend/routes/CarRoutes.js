@@ -37,4 +37,7 @@ router.delete("/delete-car/:id", CarController.deleteCarById);
 // ========== COUNTS ==========
 router.get("/count-all-cars", CarController.countAllCars);
 
+// ========== SEARCH ==========
+router.get("/search-cars", CarController.searchCars);
+
 module.exports = router;

@@ -47,7 +47,7 @@ carSchema.pre("save", function (next) {
   next();
 });
 
-carSchema.index({ car_name: "text", tags: "text" });
+carSchema.index({ car_name: "text", tags: "text", brand: "text", model: "text", description: "text" });
 
 const Car = mongoose.model("Car", carSchema);
 module.exports = Car;
