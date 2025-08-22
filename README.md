@@ -19,7 +19,7 @@ Borrow Wheelz is a **MERN stack** car rental application that allows users to re
 - User data is stored in **MongoDB**.  
 
 ### 2. Super Admin Setup  
-- After registering, open MongoDB (usually running at `localhost:5173` or `5174`).  
+- After registering, open MongoDB (usually running at `localhost:5173 || 5174).
 - Update the registered user’s role to **`superadmin`**.  
 - Only superadmins can **add cars** to the system, which will then be visible to all users.  
 
@@ -64,6 +64,10 @@ npm install
   MONGO_URI=your_mongodb_connection_string
   JWT_SECRET=your_secret_key
   PORT=5000
+	Example:
+	PORT=3010
+	DATABASE=mongodb://127.0.0.1:27017/wheelz
+	JWT_SECRET="Your Secret Code"
   ```
 - Run backend server:  
   ```bash
@@ -110,12 +114,6 @@ npm install
 - More advanced rental management features.  
 - Analytics & reporting modules.  
 
----
-
-## 📸 Screenshots / Demo (Optional)  
-_Add screenshots of user dashboard, car rental flow, and superadmin panel here._  
-
----
 
 ## 📌 Notes  
 - To enable **car management**, update a registered user’s role to `superadmin` in MongoDB.  
