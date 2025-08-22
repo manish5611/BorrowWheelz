@@ -1,13 +1,43 @@
-https://myaccount.google.com/?pli=1
+🚗 Borrow Wheelz – Car Rental Application
 
-click on security.. 
+Borrow Wheelz is a MERN stack car rental application that allows users to rent cars while giving admins the ability to manage rentals and car listings.
 
-2 step verification let it be on. 
+🛠 Tech Stack
 
-app password click on this tab or link. 
-enter your email password and login to your google account. 
+Frontend: React.js
+Backend: Node.js, Express.js
+Database: MongoDB
 
-gmail app user email and app password 
-email - allora.ecommerse@gmail.com
-project name - allora 
-seftrhqmjpyuaejq   (app password )
+🔑 Workflow
+1. User Registration
+A user can register and log in.
+User data is stored in MongoDB.
+
+2. Super Admin Setup
+After registering, open MongoDB (usually running at localhost:27017).
+Update the registered user’s role to superadmin.
+Only superadmins can add cars to the system, which will then be visible to all users.
+
+3. User Dashboard
+Shows all the cars rented by the logged-in user.
+Displays booking history and notes.
+
+4. Super Admin Dashboard
+Can view all rental requests.
+Has the ability to accept/reject rental requests.
+
+5. About Us
+Currently accessible only in the superadmin folder.
+Will be extended to normal users in future updates.
+
+📡 Backend & API
+
+APIs are set up and managed using Express.js.
+Data flow has been tested and verified.
+
+🚀 Upcoming Features
+
+UI/UX improvements for user & superadmin dashboards.
+"About Us" page for regular users.
+More advanced rental management features.
+Analytics & reporting modules.

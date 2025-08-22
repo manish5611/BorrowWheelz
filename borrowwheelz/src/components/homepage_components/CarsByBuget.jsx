@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ChevronRight, ArrowRight } from "lucide-react";
+import { ChevronRight, ChevronLeft, ArrowRight } from "lucide-react";
 import globalBackendRoute from "../../config/Config";
 
 const tabs = ["Under 1000", "1000 - 2000", "2000 - 3000", "Luxury Cars"];
@@ -60,6 +60,12 @@ const CarsByBudget = () => {
     }
   };
 
+  const handlePrev = () => {
+    if (visibleStartIndex > 0) {
+      setVisibleStartIndex((prev) => prev - 1);
+    }
+  };
+
   const handleCarClick = (slug) => {
     navigate(`/singlerent/${slug}`);
   };
@@ -90,6 +96,15 @@ const CarsByBudget = () => {
 
       {/* Car Cards + Arrow */}
       <div className="relative flex items-center">
+        {/* Left Arrow */}
+        {visibleStartIndex > 0 && (
+          <button
+            onClick={handlePrev}
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 min-w-[40px] h-10 flex items-center justify-center rounded-full shadow bg-white border z-10"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+        )}
         <div className="flex space-x-6 overflow-hidden pb-2 w-full">
           {visibleCars.length === 0 ? (
             <div className="text-gray-500 text-sm">No cars available in this range.</div>
@@ -117,17 +132,16 @@ const CarsByBudget = () => {
           )}
         </div>
 
-        {/* Arrow Button */}
+        {/* Right Arrow */}
         {visibleStartIndex + CAR_CARDS_PER_VIEW < filteredCars.length && (
           <button
             onClick={handleNext}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 min-w-[40px] h-10 flex items-center justify-center rounded-full shadow bg-white border"
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 min-w-[40px] h-10 flex items-center justify-center rounded-full shadow bg-white border z-10"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
         )}
       </div>
-
       {/* Footer CTA */}
       <button className="flex items-center gap-2 mt-4 text-sm font-medium text-green-600 hover:underline">
         All Cars Under {activeTab} <ArrowRight className="h-4 w-4" />

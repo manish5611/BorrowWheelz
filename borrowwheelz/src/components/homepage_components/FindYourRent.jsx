@@ -34,7 +34,7 @@ const FindYourRent = () => {
     return "https://via.placeholder.com/150";
   };
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = async (e) => {
     const query = e.target.value;
     setSearchTerm(query);
 
@@ -43,12 +43,14 @@ const FindYourRent = () => {
       return;
     }
 
-    const filteredCars = carModels
-      .filter((car) =>
-        car.car_name.toLowerCase().includes(query.toLowerCase())
-      )
-      .slice(0, 5); // Limit to 5 results
-    setSearchResults(filteredCars);
+    try {
+      const res = await axios.get(
+        `${globalBackendRoute}/api/search-cars?q=${encodeURIComponent(query)}`
+      );
+      setSearchResults(res.data.slice(0, 5));
+    } catch (error) {
+      setSearchResults([]);
+    }
   };
 
   const handleSearchFocus = () => {
@@ -67,7 +69,11 @@ const FindYourRent = () => {
   return (
     <div className="relative w-full h-auto">
       <div className="pt-2 px-4">
-        <img src={staticimg} alt="Carousel" className="w-full h-full object-cover" />
+        <img
+          src={staticimg}
+          alt="Carousel"
+          className="w-full h-full object-cover"
+        />
       </div>
 
       <div className="absolute top-[80%] left-1/2 transform -translate-x-1/2 w-[850px] rounded-xl shadow-lg bg-white p-10">
@@ -99,9 +105,19 @@ const FindYourRent = () => {
                   <img
                     src={getImageUrl(car.car_image)}
                     alt={car.car_name}
-                    className="h-10 w-10 object-cover rounded-full mr-3"
+                    className="h-10 w-10 object-contain mr-3"
                   />
-                  <span className="text-sm text-gray-700">{car.car_name}</span>
+                  <div className="flex flex-col flex-1">
+                    <span className="text-sm text-gray-700 font-semibold">
+                      {car.car_name}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {car.brand} {car.model} {car.year && `| ${car.year}`}
+                    </span>
+                    <span className="text-xs text-green-700 font-bold">
+                      ₹{car.rental_price_per_day} /day
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -132,7 +148,9 @@ const FindYourRent = () => {
                   alt={car.car_name}
                   className="h-16 object-contain mb-1 car_image"
                 />
-                <span className="text-xs text-center font-semibold">{car.car_name}</span>
+                <span className="text-xs text-center font-semibold">
+                  {car.car_name}
+                </span>
               </div>
             ))}
           </div>

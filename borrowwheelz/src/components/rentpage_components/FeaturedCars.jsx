@@ -1,17 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import globalBackendRoute from "../../config/Config";
 
 const tabs = ["Trending", "Popular", "Upcoming"];
+const CAR_CARDS_PER_VIEW = 4;
 
 const FeaturedCars = () => {
   const [activeTab, setActiveTab] = useState("Trending");
   const [cars, setCars] = useState([]);
-  const scrollContainerRef = useRef(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [visibleStartIndex, setVisibleStartIndex] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,6 +25,10 @@ const FeaturedCars = () => {
     fetchCars();
   }, []);
 
+  useEffect(() => {
+    setVisibleStartIndex(0); // Reset view when tab changes
+  }, [activeTab]);
+
   const filteredCars = cars.filter((car) => {
     if (activeTab === "Trending") {
       return car.tags?.toLowerCase().includes("trending");
@@ -37,6 +40,11 @@ const FeaturedCars = () => {
     return false;
   });
 
+  const visibleCars = filteredCars.slice(
+    visibleStartIndex,
+    visibleStartIndex + CAR_CARDS_PER_VIEW
+  );
+
   const getImageUrl = (img) => {
     if (img) {
       const normalized = img.replace(/\\/g, "/").split("/").pop();
@@ -45,38 +53,24 @@ const FeaturedCars = () => {
     return "https://via.placeholder.com/150";
   };
 
-  const updateScrollButtons = () => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-    setCanScrollLeft(container.scrollLeft > 0);
-    setCanScrollRight(container.scrollLeft + container.offsetWidth < container.scrollWidth);
+  const handleNext = () => {
+    if (visibleStartIndex + CAR_CARDS_PER_VIEW < filteredCars.length) {
+      setVisibleStartIndex((prev) => prev + 1);
+    }
   };
 
-  const scrollLeft = () => {
-    scrollContainerRef.current.scrollBy({ left: -300, behavior: "smooth" });
-  };
-
-  const scrollRight = () => {
-    scrollContainerRef.current.scrollBy({ left: 300, behavior: "smooth" });
+  const handlePrev = () => {
+    if (visibleStartIndex > 0) {
+      setVisibleStartIndex((prev) => prev - 1);
+    }
   };
 
   const handleCarClick = (slug) => {
     navigate(`/singlerent/${slug}`);
   };
 
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (container) {
-      container.addEventListener("scroll", updateScrollButtons);
-      updateScrollButtons(); // Initial check
-    }
-
-    return () => {
-      if (container) {
-        container.removeEventListener("scroll", updateScrollButtons);
-      }
-    };
-  }, []);
+  // Calculate container width based on number of visible cars (shrink if less than 4)
+  const containerWidth = `${Math.min(visibleCars.length, CAR_CARDS_PER_VIEW) * 270}px`;
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -99,29 +93,29 @@ const FeaturedCars = () => {
         ))}
       </div>
 
-      {/* Scrollable Car Cards */}
-      <div className="relative">
+      {/* Car Cards + Arrows */}
+      <div className="relative flex items-center">
         {/* Left Arrow */}
-        {canScrollLeft && (
+        {visibleStartIndex > 0 && (
           <button
-            onClick={scrollLeft}
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white border rounded-full shadow p-2 hover:shadow-md"
+            onClick={handlePrev}
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 min-w-[40px] h-10 flex items-center justify-center rounded-full shadow bg-white border z-10"
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-4 w-4" />
           </button>
         )}
 
         <div
-          ref={scrollContainerRef}
-          className="flex items-start space-x-6 overflow-x-auto scrollbar-hide pb-2"
+          className="flex space-x-6 overflow-hidden pb-2 w-full"
+          style={{ minHeight: 220, width: containerWidth, transition: "width 0.3s" }}
         >
-          {filteredCars.length === 0 ? (
+          {visibleCars.length === 0 ? (
             <div className="text-gray-500 text-sm">No cars available for {activeTab}.</div>
           ) : (
-            filteredCars.map((car, idx) => (
+            visibleCars.map((car, idx) => (
               <div
                 key={idx}
-                className="min-w-[260px] bg-white rounded-xl border p-4 hover:shadow transition-all duration-200 cursor-pointer"
+                className="min-w-[208px] bg-white rounded-2xl border p-4 hover:shadow transition-all duration-200 cursor-pointer"
                 onClick={() => handleCarClick(car.slug)}
               >
                 <img
@@ -142,15 +136,20 @@ const FeaturedCars = () => {
         </div>
 
         {/* Right Arrow */}
-        {canScrollRight && (
+        {visibleStartIndex + CAR_CARDS_PER_VIEW < filteredCars.length && (
           <button
-            onClick={scrollRight}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white border rounded-full shadow p-2 hover:shadow-md"
+            onClick={handleNext}
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 min-w-[40px] h-10 flex items-center justify-center rounded-full shadow bg-white border z-10"
           >
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight className="h-4 w-4" />
           </button>
         )}
       </div>
+      {/* Hide scrollbar for all browsers */}
+      <style>{`
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </div>
   );
 };

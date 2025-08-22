@@ -217,3 +217,38 @@ exports.countAllCars = async (req, res) => {
     res.status(500).json({ message: "Count failed" });
   }
 };
+
+exports.searchCars = async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q || q.trim() === "") {
+      return res.status(400).json({ message: "Query is required." });
+    }
+
+    // First try text search
+    let cars = await Car.find(
+      { $text: { $search: q }, isDeleted: false },
+      { score: { $meta: "textScore" } }
+    ).sort({ score: { $meta: "textScore" } });
+
+    // If no results, fallback to regex search on multiple fields
+    if (cars.length === 0) {
+      const regex = new RegExp(q, "i");
+      cars = await Car.find({
+        isDeleted: false,
+        $or: [
+          { car_name: regex },
+          { brand: regex },
+          { model: regex },
+          { description: regex },
+          { tags: regex }
+        ]
+      });
+    }
+
+    res.status(200).json(cars);
+  } catch (error) {
+    console.error("Search Cars Error:", error);
+    res.status(500).json({ message: "Failed to search cars." });
+  }
+};
